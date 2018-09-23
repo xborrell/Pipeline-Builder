@@ -1,17 +1,9 @@
 ﻿namespace Pipeline
 {
     using System;
-    using System.Linq;
 
-    public class PipelineAction : IPipelineAction
+    public class PipelineAction : PipelineItem, IPipelineAction
     {
-        public Type Step { get; }
-        public Type InputType { get; }
-
-        public PipelineAction(Type step, Type inputType)
-        {
-            Step = step;
-            InputType = inputType;
-        }
+        public PipelineAction(Type step, Type inputType) : base(step, inputType) { }
     }
 }

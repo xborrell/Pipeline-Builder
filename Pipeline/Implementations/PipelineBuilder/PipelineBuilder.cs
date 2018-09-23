@@ -3,11 +3,13 @@
     using Autofac;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class PipelineBuilder<TInput> : IPipelineBuilder<TInput>
     {
         private readonly IPipelineFactory factory;
         private List<IPipelineItem> transformations;
+        private IPipelineItem lastItem;
 
         public PipelineBuilder(IPipelineFactory factory)
         {
@@ -17,21 +19,21 @@
 
         public IPipelineBuilder<TInput> AddAction<TStep>() where TStep : ICompilerTransformation
         {
-            var pipelineItem = factory.Create<TStep>();
+            var pipelineItem = factory.CreateStep<TStep>();
 
             if (!(pipelineItem is IPipelineAction))
             {
                 throw new PipelineBuilderException("The action must implement ICompilerAction<InputType>.");
             }
 
-            transformations.Add(pipelineItem);
+            AddPipelineItem(pipelineItem);
 
             return this;
         }
 
         public IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerTransformation
         {
-            var pipelineItem = factory.Create<TStep>();
+            var pipelineItem = factory.CreateStep<TStep>();
 
             if (!(pipelineItem is IPipelineTransformation transformation))
             {
@@ -40,43 +42,81 @@
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                //transformation.Name
+                transformation.SetName(name);
             }
 
-            transformations.Add(pipelineItem);
+            AddPipelineItem(pipelineItem);
+
+            return this;
+        }
+
+        public IPipelineBuilder<TInput> LinkTo(string name)
+        {
+            name = name.ToLower();
+
+            var transformation = transformations.OfType<IPipelineTransformation>().First(t => t.Name == name);
+
+            lastItem.AddLink(factory.CreateLink(false, transformation, lastItem));
+
 
             return this;
         }
 
         public IDataflowPipeline<TInput> Build()
         {
-            IPipelineTransformation linkedItem = null;
-
             foreach (var pipelineItem in transformations)
             {
-                CheckInputType(linkedItem, pipelineItem);
-                linkedItem = pipelineItem as IPipelineTransformation;
+                CheckInputType(pipelineItem);
             }
 
             return null;
         }
 
-        private void CheckInputType(IPipelineTransformation linkedItem, IPipelineItem pipelineItem)
+        private void CheckInputType(IPipelineItem pipelineItem)
         {
-            var outputLastType = GetLastOutputType(linkedItem);
+            Type sourceToMatch;
+            var numberOfLinks = pipelineItem.Links.Count();
 
-            if (pipelineItem.InputType != outputLastType)
+            if (numberOfLinks == 0)
             {
-                throw new PipelineBuilderException($"Expects input type {outputLastType.Name} but found {pipelineItem.InputType.Name}.");
+                sourceToMatch = typeof(TInput);
+            } else if (numberOfLinks == 1)
+            {
+                var link = pipelineItem.Links.First();
+
+                sourceToMatch = link.Source.OutputType;
+            } else
+            {
+                throw new NotImplementedException();
+            }
+
+            if (pipelineItem.InputType != sourceToMatch)
+            {
+                throw new PipelineBuilderException($"Expects input type {sourceToMatch.Name} but found {pipelineItem.InputType.Name}.");
             }
         }
 
-        private Type GetLastOutputType(IPipelineTransformation linkedItem)
+        private void LinkByDefault(IPipelineItem item)
         {
-            return linkedItem == null
-                ? typeof(TInput)
-                : linkedItem.OutputType
-                ;
+            var pos = transformations.IndexOf(item);
+
+            while (pos > 0)
+            {
+                pos--;
+
+                if (transformations[pos] is IPipelineTransformation transformation)
+                {
+                    item.AddLink(factory.CreateLink(true, transformation, item));
+                    break;
+                }
+            }
+        }
+
+        private void AddPipelineItem(IPipelineItem pipelineItem)
+        {
+            transformations.Add(pipelineItem);
+            LinkByDefault(pipelineItem);
+            lastItem = pipelineItem;
         }
     }
 }

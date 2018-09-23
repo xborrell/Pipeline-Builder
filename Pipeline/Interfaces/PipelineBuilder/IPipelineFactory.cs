@@ -4,6 +4,7 @@
 
     public interface IPipelineFactory
     {
-        IPipelineItem Create<TStep>();
+        IPipelineItem CreateStep<TStep>();
+        IPipelineLink CreateLink(bool isDefault, IPipelineTransformation source, IPipelineItem target);
     }
 }

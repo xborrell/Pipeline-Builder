@@ -16,10 +16,20 @@
         {
             factory = Substitute.For<IPipelineFactory>();
 
-            factory.Create<IRejectableTransformation>().Returns(Substitute.For<IPipelineItem>());
-            factory.Create<IIntAction>().Returns(new PipelineAction(typeof(IIntAction), typeof(int)));
-            factory.Create<IIntTransformation>().Returns(new PipelineTransformation(typeof(IIntTransformation), typeof(int), typeof(int)));
-            factory.Create<IIntToStringTransformation>().Returns(new PipelineTransformation(typeof(IIntToStringTransformation), typeof(int), typeof(string)));
+            factory.CreateStep<IRejectableTransformation>().Returns(x => Substitute.For<IPipelineItem>());
+            factory.CreateStep<IIntAction>().Returns( x => new PipelineAction(typeof(IIntAction), typeof(int)));
+            factory.CreateStep<IStringAction>().Returns(x => new PipelineAction(typeof(IStringAction), typeof(string)));
+            factory.CreateStep<IIntTransformation>().Returns(x => new PipelineTransformation(typeof(IIntTransformation), typeof(int), typeof(int)));
+            factory.CreateStep<IIntToStringTransformation>().Returns(x => new PipelineTransformation(typeof(IIntToStringTransformation), typeof(int), typeof(string)));
+
+            factory.CreateLink(Arg.Any<bool>(), Arg.Any<IPipelineTransformation>(), Arg.Any<IPipelineItem>()).Returns(x =>
+            {
+                var isDefault = x.Arg<bool>();
+                var source = x.Arg<IPipelineTransformation>();
+                var target = x.Arg<IPipelineItem>();
+
+                return new PipelineLink(isDefault, source, target);
+            });
         }
 
         [Fact]
@@ -85,8 +95,9 @@
         [Fact]
         public void AcceptsStepWhenBuildAndTheTypeMatchThePipelineAndIsTheFirstStep()
         {
-            var pipeline = new PipelineBuilder<int>(factory);
-            pipeline.AddAction<IIntAction>();
+            var pipeline = new PipelineBuilder<int>(factory)
+                .AddAction<IIntAction>()
+                ;
 
             //Action
             Action acc = () => pipeline.Build();
@@ -98,8 +109,9 @@
         [Fact]
         public void RejectStepWhenbuildAndTheTypeNotMatchThePipelineAndIsTheFirstStep()
         {
-            var pipeline = new PipelineBuilder<string>(factory);
-            pipeline.AddAction<IIntAction>();
+            var pipeline = new PipelineBuilder<string>(factory)
+                .AddAction<IIntAction>()
+                ;
 
             //Action
             Action acc = () => pipeline.Build();
@@ -111,9 +123,10 @@
         [Fact]
         public void AcceptsStepWhenbuildAndTheTypeMatchTheDefaultLinkedTransformation()
         {
-            var pipeline = new PipelineBuilder<int>(factory);
-            pipeline.AddTransformation<IIntTransformation>();
-            pipeline.AddAction<IIntAction>();
+            var pipeline = new PipelineBuilder<int>(factory)
+                .AddTransformation<IIntTransformation>()
+                .AddAction<IIntAction>()
+                ;
 
             //Action
             Action acc = () => pipeline.Build();
@@ -125,9 +138,10 @@
         [Fact]
         public void RejectStepWhenbuildAndTheTypeNotMatchTheDefaultLinkedTransformation()
         {
-            var pipeline = new PipelineBuilder<int>(factory);
-            pipeline.AddTransformation<IIntToStringTransformation>();
-            pipeline.AddAction<IIntAction>();
+            var pipeline = new PipelineBuilder<int>(factory)
+                .AddTransformation<IIntToStringTransformation>()
+                .AddAction<IIntAction>()
+                ;
 
             //Action
             Action acc = () => pipeline.Build();
@@ -139,8 +153,9 @@
         [Fact]
         public void AddTransformationWithName()
         {
-            var pipeline = new PipelineBuilder<int>(factory);
-            pipeline.AddTransformation<IIntToStringTransformation>("name");
+            var pipeline = new PipelineBuilder<int>(factory)
+                .AddTransformation<IIntToStringTransformation>("name")
+                ;
 
             //Action
             Action acc = () => pipeline.Build();
@@ -149,9 +164,38 @@
             acc.Should().NotThrow<PipelineBuilderException>();
         }
 
-        private interface IRejectableTransformation : ICompilerTransformation { }
-        private interface IIntAction : ICompilerAction<int> { }
-        private interface IIntTransformation : ICompilerTransformation<int, int> { }
-        private interface IIntToStringTransformation : ICompilerTransformation<int, string> { }
+        [Fact]
+        public void AcceptsStepWhenbuildAndTheTypeMatchTheLastTransformation()
+        {
+            var pipeline = new PipelineBuilder<int>(factory)
+                .AddTransformation<IIntToStringTransformation>()
+                .AddAction<IStringAction>()
+                .AddAction<IStringAction>()
+                ;
+
+            //Action
+            Action acc = () => pipeline.Build();
+
+            //Assert
+            acc.Should().NotThrow<PipelineBuilderException>();
+        }
+
+        [Fact]
+        public void ExplicitLinkSteps()
+        {
+            var pipeline = new PipelineBuilder<int>(factory)
+                .AddTransformation<IIntTransformation>("name")
+                .AddTransformation<IIntToStringTransformation>()
+                .AddAction<IStringAction>()
+                .AddAction<IIntAction>()
+                    .LinkTo("name")
+                ;
+
+            //Action
+            Action acc = () => pipeline.Build();
+
+            //Assert
+            acc.Should().NotThrow<PipelineBuilderException>();
+        }
     }
 }

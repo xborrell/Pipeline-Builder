@@ -60,6 +60,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="PipelineBuilderShould.cs" />
+    <Compile Include="PipelineItemShould.cs" />
+    <Compile Include="TestInterfaces.cs" />
+    <Compile Include="PipelineFactoryShould.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

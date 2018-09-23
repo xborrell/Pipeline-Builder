@@ -5,5 +5,6 @@
         IDataflowPipeline<TInput> Build();
         IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerTransformation;
         IPipelineBuilder<TInput> AddAction<TStep>() where TStep : ICompilerTransformation;
+        IPipelineBuilder<TInput> LinkTo(string name);
     }
 }

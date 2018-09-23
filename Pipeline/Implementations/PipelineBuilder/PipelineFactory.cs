@@ -9,14 +9,24 @@
         private static Type compilerActionGenericType = typeof(ICompilerAction<>);
         private readonly Func<Type, Type, IPipelineAction> actionFactory;
         private readonly Func<Type, Type, Type, IPipelineTransformation> transformationFactory;
+        private readonly Func<bool, IPipelineTransformation, IPipelineItem, IPipelineLink> linkFactory;
 
-        public PipelineFactory(Func<Type, Type, IPipelineAction> actionFactory, Func<Type, Type, Type, IPipelineTransformation> transformationFactory)
+        public PipelineFactory(
+            Func<Type, Type, IPipelineAction> actionFactory, 
+            Func<Type, Type, Type, IPipelineTransformation> transformationFactory, 
+            Func<bool, IPipelineTransformation, IPipelineItem, IPipelineLink> linkFactory)
         {
             this.actionFactory = actionFactory ?? throw new ArgumentNullException(nameof(actionFactory));
             this.transformationFactory = transformationFactory ?? throw new ArgumentNullException(nameof(transformationFactory));
+            this.linkFactory = linkFactory ?? throw new ArgumentNullException(nameof(linkFactory));
         }
 
-        public IPipelineItem Create<TStep>()
+        public IPipelineLink CreateLink(bool isDefault, IPipelineTransformation source, IPipelineItem target)
+        {
+            return linkFactory(isDefault, source, target);
+        }
+
+        public IPipelineItem CreateStep<TStep>()
         {
             var step = typeof(TStep);
             var interfacesImplemented = step.GetInterfaces();
@@ -35,12 +45,12 @@
 
             if (implementedAction != null)
             {
-                var inputType = implementedTransformation.GetGenericArguments()[0];
+                var inputType = implementedAction.GetGenericArguments()[0];
 
                 return actionFactory(step, inputType);
             }
 
-            throw new NotImplementedException();
+            throw new PipelineBuilderException($"{step.Name} is not a transformation nor action.");
         }
     }
 }

@@ -2,20 +2,23 @@
 {
     using System;
 
-    public class PipelineTransformation : IPipelineTransformation
+    public class PipelineTransformation : PipelineItem, IPipelineTransformation
     {
-        private static Type compilerTransformationGenericType = typeof(ICompilerTransformation<,>);
-        private static Type compilerActionGenericType = typeof(ICompilerAction<>);
+        private static readonly Type compilerTransformationGenericType = typeof(ICompilerTransformation<,>);
+        private static readonly Type compilerActionGenericType = typeof(ICompilerAction<>);
 
-        public Type Step { get; }
-        public Type InputType { get; }
         public Type OutputType { get; }
 
-        public PipelineTransformation(Type step, Type inputType, Type outputType)
+        public string Name { get; private set; }
+
+        public PipelineTransformation(Type step, Type inputType, Type outputType) : base(step, inputType)
         {
-            Step = step;
-            InputType = inputType;
             OutputType = outputType;
+        }
+
+        public void SetName(string name)
+        {
+            Name = name.ToLower();
         }
     }
 }
