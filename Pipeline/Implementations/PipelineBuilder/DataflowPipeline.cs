@@ -48,13 +48,6 @@
             lastSteps.Add(block);
         }
 
-        //var validation = new TransformBlock<ICompilerOptions, ICompilerOptions>(options => validationStep.Ejecutar(options), blockOptions);
-        //var displayParameters = new ActionBlock<ICompilerOptions>(options => displayOptionsStep.Ejecutar(options), blockOptions);
-        //var readFile = new TransformBlock<ICompilerOptions, string>(options => readFileStep.Ejecutar(options), blockOptions);
-
-
-
-
         public void Post(T input)
         {
             firstStep.Post(input);
