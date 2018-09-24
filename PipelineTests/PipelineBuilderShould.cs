@@ -17,7 +17,7 @@
             factory = Substitute.For<IPipelineFactory>();
 
             factory.CreateStep<IRejectableTransformation>().Returns(x => Substitute.For<IPipelineItem>());
-            factory.CreateStep<IIntAction>().Returns( x => new PipelineAction(typeof(IIntAction), typeof(int)));
+            factory.CreateStep<IIntAction>().Returns(x => new PipelineAction(typeof(IIntAction), typeof(int)));
             factory.CreateStep<IStringAction>().Returns(x => new PipelineAction(typeof(IStringAction), typeof(string)));
             factory.CreateStep<IIntTransformation>().Returns(x => new PipelineTransformation(typeof(IIntTransformation), typeof(int), typeof(int)));
             factory.CreateStep<IIntToStringTransformation>().Returns(x => new PipelineTransformation(typeof(IIntToStringTransformation), typeof(int), typeof(string)));

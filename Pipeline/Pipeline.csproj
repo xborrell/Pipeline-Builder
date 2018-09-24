@@ -56,6 +56,7 @@
     <Compile Include="Implementations\Compiler.cs" />
     <Compile Include="Implementations\CompilerOptions.cs" />
     <Compile Include="Implementations\IocRegister.cs" />
+    <Compile Include="Implementations\PipelineBuilder\DataflowPipeline.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineAction.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineBuilder.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineFactory.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="Interfaces\ICompiler.cs" />
     <Compile Include="Interfaces\ICompilerOptions.cs" />
     <Compile Include="Interfaces\ICompilerTransformation.cs" />
-    <Compile Include="Interfaces\IDataflowPipeline.cs" />
+    <Compile Include="Interfaces\PipelineBuilder\IDataflowPipeline.cs" />
     <Compile Include="Interfaces\IIoCRegister.cs" />
     <Compile Include="Interfaces\IPipelineBuilder.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineAction.cs" />
