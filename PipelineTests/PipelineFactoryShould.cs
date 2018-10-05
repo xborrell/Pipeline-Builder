@@ -12,14 +12,14 @@
     {
         private readonly Func<Type, Type, IPipelineAction> actionFactory;
         private readonly Func<Type, Type, Type, IPipelineTransformation> transformationFactory;
-        private readonly Func<bool, IPipelineTransformation, IPipelineItem, IPipelineLink> linkFactory;
+        private readonly Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory;
         private readonly PipelineFactory factory;
 
         public PipelineFactoryShould()
         {
             actionFactory = Substitute.For<Func<Type, Type, IPipelineAction>>();
             transformationFactory = Substitute.For<Func<Type, Type, Type, IPipelineTransformation>>();
-            linkFactory = Substitute.For<Func<bool, IPipelineTransformation, IPipelineItem, IPipelineLink>>();
+            linkFactory = Substitute.For<Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink>>();
             factory = new PipelineFactory(actionFactory, transformationFactory, linkFactory);
         }
 
@@ -69,7 +69,7 @@
         {
             //arrange
             var source = Substitute.For<IPipelineTransformation>();
-            var target = Substitute.For<IPipelineItem>();
+            var target = Substitute.For<IPipelineTarget>();
 
             //Action
             factory.CreateLink(true, source, target);

@@ -1,6 +1,6 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineAction : IPipelineItem
+    public interface IPipelineAction : IPipelineTarget
     {
     }
 }

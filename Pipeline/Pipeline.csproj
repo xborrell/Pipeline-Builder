@@ -79,8 +79,10 @@
     <Compile Include="Interfaces\IPipelineBuilder.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineAction.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineFactory.cs" />
+    <Compile Include="Interfaces\PipelineBuilder\IPipelineTarget.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineItem.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineLink.cs" />
+    <Compile Include="Interfaces\PipelineBuilder\IPipelineSource.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineTransformation.cs" />
     <Compile Include="Interfaces\Steps\IDisplayParametersStep.cs" />
     <Compile Include="Interfaces\Steps\IReadFileStep.cs" />

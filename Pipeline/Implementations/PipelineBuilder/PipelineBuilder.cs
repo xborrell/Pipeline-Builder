@@ -8,8 +8,8 @@
     public class PipelineBuilder<TInput> : IPipelineBuilder<TInput>
     {
         private readonly IPipelineFactory factory;
-        private List<IPipelineItem> transformations;
-        private IPipelineItem lastItem;
+        private readonly List<IPipelineItem> transformations;
+        private IPipelineTarget lastItem;
 
         public PipelineBuilder(IPipelineFactory factory)
         {
@@ -26,7 +26,7 @@
                 throw new PipelineBuilderException("The action must implement ICompilerAction<InputType>.");
             }
 
-            AddPipelineItem(pipelineItem);
+            AddTarget(pipelineItem);
 
             return this;
         }
@@ -45,7 +45,7 @@
                 transformation.SetName(name);
             }
 
-            AddPipelineItem(pipelineItem);
+            AddTarget(pipelineItem);
 
             return this;
         }
@@ -66,37 +66,61 @@
         {
             foreach (var pipelineItem in transformations)
             {
-                CheckInputType(pipelineItem);
+                CheckSourceType(pipelineItem as IPipelineTarget);
             }
 
             return null;
         }
 
-        private void CheckInputType(IPipelineItem pipelineItem)
+        private void CheckSourceType(IPipelineTarget pipelineTarget)
         {
+            if (pipelineTarget == null)
+            {
+                return;
+            }
+
             Type sourceToMatch;
-            var numberOfLinks = pipelineItem.Links.Count();
+            var numberOfLinks = pipelineTarget.Links.Count();
 
             if (numberOfLinks == 0)
             {
                 sourceToMatch = typeof(TInput);
             } else if (numberOfLinks == 1)
             {
-                var link = pipelineItem.Links.First();
+                var link = pipelineTarget.Links.First();
 
                 sourceToMatch = link.Source.OutputType;
             } else
             {
-                throw new NotImplementedException();
+                var parameters = pipelineTarget.Links.Select(link => link.Source.OutputType).ToArray();
+
+                Type precursorType;
+
+                switch (parameters.Length)
+                {
+                    case 2: 
+                        precursorType = typeof(Tuple<,>);
+                        break;
+                    case 3: 
+                        precursorType = typeof(Tuple<,,>);
+                        break;
+                    case 4: 
+                        precursorType = typeof(Tuple<,,,>);
+                        break;
+                    default : 
+                        throw new NotImplementedException();
+                }
+
+                sourceToMatch = precursorType.MakeGenericType(parameters);
             }
 
-            if (pipelineItem.InputType != sourceToMatch)
+            if (pipelineTarget.InputType != sourceToMatch)
             {
-                throw new PipelineBuilderException($"Expects input type {sourceToMatch.Name} but found {pipelineItem.InputType.Name}.");
+                throw new PipelineBuilderException($"Expects input type {sourceToMatch.FullName} but found {pipelineTarget.InputType.FullName}.");
             }
         }
 
-        private void LinkByDefault(IPipelineItem item)
+        private void LinkByDefault(IPipelineTarget item)
         {
             var pos = transformations.IndexOf(item);
 
@@ -112,7 +136,7 @@
             }
         }
 
-        private void AddPipelineItem(IPipelineItem pipelineItem)
+        private void AddTarget(IPipelineTarget pipelineItem)
         {
             transformations.Add(pipelineItem);
             LinkByDefault(pipelineItem);

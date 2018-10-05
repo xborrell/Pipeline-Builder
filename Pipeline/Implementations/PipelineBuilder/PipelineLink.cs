@@ -5,10 +5,10 @@
     public class PipelineLink : IPipelineLink
     {
         public bool IsDefault { get; }
-        public IPipelineTransformation Source { get; }
-        public IPipelineItem Target { get; }
+        public IPipelineSource Source { get; }
+        public IPipelineTarget Target { get; }
 
-        public PipelineLink( bool isDefault, IPipelineTransformation source, IPipelineItem target)
+        public PipelineLink( bool isDefault, IPipelineSource source, IPipelineTarget target)
         {
             IsDefault = isDefault;
             Source = source ?? throw new ArgumentNullException(nameof(source));

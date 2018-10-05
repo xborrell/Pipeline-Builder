@@ -5,7 +5,7 @@
     public interface IPipelineLink 
     {
         bool IsDefault { get; }
-        IPipelineTransformation Source { get; }
-        IPipelineItem Target { get; }
+        IPipelineSource Source { get; }
+        IPipelineTarget Target { get; }
     }
 }

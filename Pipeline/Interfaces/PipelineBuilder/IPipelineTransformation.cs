@@ -1,12 +1,6 @@
 ﻿namespace Pipeline
 {
-    using System;
-
-    public interface IPipelineTransformation : IPipelineItem
+    public interface IPipelineTransformation : IPipelineSource, IPipelineTarget
     {
-        string Name { get; }
-        Type OutputType { get; }
-
-        void SetName(string name);
     }
 }

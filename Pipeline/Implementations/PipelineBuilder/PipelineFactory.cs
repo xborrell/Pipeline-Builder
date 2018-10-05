@@ -5,33 +5,33 @@
 
     public class PipelineFactory : IPipelineFactory
     {
-        private static Type compilerTransformationGenericType = typeof(ICompilerTransformation<,>);
-        private static Type compilerActionGenericType = typeof(ICompilerAction<>);
+        private static readonly Type CompilerTransformationGenericType = typeof(ICompilerTransformation<,>);
+        private static readonly Type CompilerActionGenericType = typeof(ICompilerAction<>);
         private readonly Func<Type, Type, IPipelineAction> actionFactory;
         private readonly Func<Type, Type, Type, IPipelineTransformation> transformationFactory;
-        private readonly Func<bool, IPipelineTransformation, IPipelineItem, IPipelineLink> linkFactory;
+        private readonly Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory;
 
         public PipelineFactory(
             Func<Type, Type, IPipelineAction> actionFactory, 
             Func<Type, Type, Type, IPipelineTransformation> transformationFactory, 
-            Func<bool, IPipelineTransformation, IPipelineItem, IPipelineLink> linkFactory)
+            Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory)
         {
             this.actionFactory = actionFactory ?? throw new ArgumentNullException(nameof(actionFactory));
             this.transformationFactory = transformationFactory ?? throw new ArgumentNullException(nameof(transformationFactory));
             this.linkFactory = linkFactory ?? throw new ArgumentNullException(nameof(linkFactory));
         }
 
-        public IPipelineLink CreateLink(bool isDefault, IPipelineTransformation source, IPipelineItem target)
+        public IPipelineLink CreateLink(bool isDefault, IPipelineSource source, IPipelineTarget target)
         {
             return linkFactory(isDefault, source, target);
         }
 
-        public IPipelineItem CreateStep<TStep>()
+        public IPipelineTarget CreateStep<TStep>()
         {
             var step = typeof(TStep);
             var interfacesImplemented = step.GetInterfaces();
 
-            var implementedTransformation = interfacesImplemented.FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == compilerTransformationGenericType);
+            var implementedTransformation = interfacesImplemented.FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == CompilerTransformationGenericType);
 
             if (implementedTransformation != null)
             {
@@ -41,7 +41,7 @@
                 return transformationFactory(step, inputType, outputType);
             }
 
-            var implementedAction = interfacesImplemented.FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == compilerActionGenericType);
+            var implementedAction = interfacesImplemented.FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == CompilerActionGenericType);
 
             if (implementedAction != null)
             {

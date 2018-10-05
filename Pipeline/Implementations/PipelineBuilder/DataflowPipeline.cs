@@ -9,8 +9,8 @@
     public class DataflowPipeline<T> : IDataflowPipeline<T>
     {
         private ITargetBlock<T> firstStep;
-        private List<IDataflowBlock> steps;
-        private List<IDataflowBlock> lastSteps;
+        private readonly List<IDataflowBlock> steps;
+        private readonly List<IDataflowBlock> lastSteps;
 
         public ExecutionDataflowBlockOptions BlockOptions { get; }
         public DataflowLinkOptions LinkOptions { get; private set; }

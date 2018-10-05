@@ -16,17 +16,19 @@
         {
             factory = Substitute.For<IPipelineFactory>();
 
-            factory.CreateStep<IRejectableTransformation>().Returns(x => Substitute.For<IPipelineItem>());
+            factory.CreateStep<IRejectableTransformation>().Returns(x => Substitute.For<IPipelineTarget>());
             factory.CreateStep<IIntAction>().Returns(x => new PipelineAction(typeof(IIntAction), typeof(int)));
             factory.CreateStep<IStringAction>().Returns(x => new PipelineAction(typeof(IStringAction), typeof(string)));
             factory.CreateStep<IIntTransformation>().Returns(x => new PipelineTransformation(typeof(IIntTransformation), typeof(int), typeof(int)));
             factory.CreateStep<IIntToStringTransformation>().Returns(x => new PipelineTransformation(typeof(IIntToStringTransformation), typeof(int), typeof(string)));
+            factory.CreateStep<IStringTransformation>().Returns(x => new PipelineTransformation(typeof(IStringTransformation), typeof(string), typeof(string)));
+            factory.CreateStep<ITupla2Action>().Returns(x => new PipelineAction(typeof(ITupla2Action), typeof(Tuple<int, string>)));
 
-            factory.CreateLink(Arg.Any<bool>(), Arg.Any<IPipelineTransformation>(), Arg.Any<IPipelineItem>()).Returns(x =>
+            factory.CreateLink(Arg.Any<bool>(), Arg.Any<IPipelineSource>(), Arg.Any<IPipelineTarget>()).Returns(x =>
             {
                 var isDefault = x.Arg<bool>();
-                var source = x.Arg<IPipelineTransformation>();
-                var target = x.Arg<IPipelineItem>();
+                var source = x.Arg<IPipelineSource>();
+                var target = x.Arg<IPipelineTarget>();
 
                 return new PipelineLink(isDefault, source, target);
             });
@@ -196,6 +198,26 @@
 
             //Assert
             acc.Should().NotThrow<PipelineBuilderException>();
+        }
+
+        [Fact]
+        public void ResolveStepsWithTwoLinks()
+        {
+            var pipeline = new PipelineBuilder<int>(factory)
+                    .AddTransformation<IIntTransformation>("name1")
+                    .AddTransformation<IIntToStringTransformation>()
+                    .AddTransformation<IStringTransformation>("name2")
+                    .AddAction<IStringAction>()
+                    .AddAction<ITupla2Action>()
+                    .LinkTo("name1")
+                    .LinkTo("name2")
+                ;
+
+            //Action
+            Action acc = () => pipeline.Build();
+
+            //Assert
+            acc.Should().NotThrow<Exception>();
         }
     }
 }
