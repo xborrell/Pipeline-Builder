@@ -4,9 +4,6 @@
 
     public class PipelineTransformation : PipelineItem, IPipelineTransformation
     {
-        private static readonly Type compilerTransformationGenericType = typeof(ICompilerTransformation<,>);
-        private static readonly Type compilerActionGenericType = typeof(ICompilerAction<>);
-
         public Type OutputType { get; }
 
         public string Name { get; private set; }

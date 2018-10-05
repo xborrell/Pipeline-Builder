@@ -60,6 +60,7 @@
     <Compile Include="Implementations\PipelineBuilder\PipelineAction.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineBuilder.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineFactory.cs" />
+    <Compile Include="Implementations\PipelineBuilder\PipelineJoin.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineItem.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineLink.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineTransformation.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Interfaces\PipelineBuilder\IPipelineItem.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineLink.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineSource.cs" />
+    <Compile Include="Interfaces\PipelineBuilder\IPipelineJoin.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineTransformation.cs" />
     <Compile Include="Interfaces\Steps\IDisplayParametersStep.cs" />
     <Compile Include="Interfaces\Steps\IReadFileStep.cs" />

@@ -14,6 +14,7 @@
         private readonly Func<Type, Type, IPipelineAction> actionFactory;
         private readonly Func<Type, Type, Type, IPipelineTransformation> transformationFactory;
         private readonly Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory;
+        private readonly Func<Type, Type, IPipelineJoin> joinFactory;
         private readonly PipelineFactory factory;
 
         public PipelineFactoryShould()
@@ -21,7 +22,8 @@
             actionFactory = Substitute.For<Func<Type, Type, IPipelineAction>>();
             transformationFactory = Substitute.For<Func<Type, Type, Type, IPipelineTransformation>>();
             linkFactory = Substitute.For<Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink>>();
-            factory = new PipelineFactory(actionFactory, transformationFactory, linkFactory);
+            joinFactory = Substitute.For<Func<Type, Type, IPipelineJoin>>();
+            factory = new PipelineFactory(actionFactory, transformationFactory, linkFactory, joinFactory);
         }
 
         [Fact]

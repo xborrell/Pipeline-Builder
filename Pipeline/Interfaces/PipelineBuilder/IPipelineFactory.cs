@@ -6,5 +6,6 @@
     {
         IPipelineTarget CreateStep<TStep>();
         IPipelineLink CreateLink(bool isDefault, IPipelineSource source, IPipelineTarget target);
+        IPipelineJoin CreateJoin(Type source1, Type source2);
     }
 }

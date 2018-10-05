@@ -249,10 +249,12 @@
                 ;
 
             //Action
-            Action acc = () => pipeline.Build();
+            pipeline.Build();
 
             //Assert
-            acc.Should().NotThrow<Exception>();
+            tupla2Action.Links.Count().Should().Be(1);
+            var link = tupla2Action.Links.First();
+            link.Source.Should().BeAssignableTo<IPipelineJoin>();
         }
     }
 }

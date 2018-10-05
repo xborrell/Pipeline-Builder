@@ -57,14 +57,25 @@
             var transformation = transformations.OfType<IPipelineTransformation>().First(t => t.Name == name);
 
             var lastLink = lastItem.Links.FirstOrDefault();
-
-            if (lastLink != null && lastLink.IsDefault)
+            if (lastLink == null)
             {
-                lastItem.RemoveLink(lastLink);
+                throw new InvalidOperationException("Missing Default link");
             }
 
-            lastItem.AddLink(factory.CreateLink(false, transformation, lastItem));
+            if (lastLink.IsDefault)
+            {
+                lastItem.RemoveLink(lastLink);
+                lastItem.AddLink(factory.CreateLink(false, transformation, lastItem));
 
+                return this;
+            }
+
+            var join = factory.CreateJoin(lastLink.Source.OutputType, transformation.OutputType );
+
+            join.AddLink(factory.CreateLink(false, join, lastItem));
+            join.AddLink(factory.CreateLink(false, lastLink.Source, join));
+            lastItem.RemoveLink(lastLink);
+            join.AddLink(factory.CreateLink(false, transformation, join));
 
             return this;
         }
@@ -73,57 +84,65 @@
         {
             foreach (var pipelineItem in transformations)
             {
-                CheckSourceType(pipelineItem as IPipelineTarget);
+                CheckPipelineItem((dynamic)pipelineItem);
             }
 
             return null;
         }
 
-        private void CheckSourceType(IPipelineTarget pipelineTarget)
+        private void CheckPipelineItem(IPipelineItem item)
         {
-            if (pipelineTarget == null)
+            throw new NotImplementedException();
+        }
+
+        private void CheckPipelineItem(IPipelineJoin join)
+        {
+            var numberOfLinks = join.Links.Count();
+
+            if (numberOfLinks != 2)
             {
-                return;
+                throw new InvalidOperationException();
             }
+            
+            var source1ToMatch = join.Links.First().Source.OutputType;
+            var target1ToMatch = join.InputType;
 
-            Type sourceToMatch;
-            var numberOfLinks = pipelineTarget.Links.Count();
+            CheckTypes(source1ToMatch, target1ToMatch);
 
-            if (numberOfLinks == 0)
+            var source2ToMatch = join.Links.First().Source.OutputType;
+            var target2ToMatch = join.InputType2;
+
+            CheckTypes(source2ToMatch, target2ToMatch);
+        }
+
+        private void CheckPipelineItem(IPipelineAction action)
+        {
+            var sourceToMatch = !action.Links.Any()
+                ? typeof(TInput)
+                : action.Links.First().Source.OutputType;
+
+            var targetToMatch = action.InputType;
+
+            CheckTypes(sourceToMatch, targetToMatch);
+        }
+
+        private void CheckPipelineItem(IPipelineTransformation transformation)
+        {
+
+            var sourceToMatch = !transformation.Links.Any()
+                ? typeof(TInput)
+                : transformation.Links.First().Source.OutputType;
+
+            var targetToMatch = transformation.InputType;
+
+            CheckTypes(sourceToMatch, targetToMatch);
+        }
+
+        private void CheckTypes(Type sourceToMatch, Type targetToMatch)
+        {
+            if (sourceToMatch != targetToMatch)
             {
-                sourceToMatch = typeof(TInput);
-            } else if (numberOfLinks == 1)
-            {
-                var link = pipelineTarget.Links.First();
-
-                sourceToMatch = link.Source.OutputType;
-            } else
-            {
-                var parameters = pipelineTarget.Links.Select(link => link.Source.OutputType).ToArray();
-
-                Type precursorType;
-
-                switch (parameters.Length)
-                {
-                    case 2: 
-                        precursorType = typeof(Tuple<,>);
-                        break;
-                    case 3: 
-                        precursorType = typeof(Tuple<,,>);
-                        break;
-                    case 4: 
-                        precursorType = typeof(Tuple<,,,>);
-                        break;
-                    default : 
-                        throw new NotImplementedException();
-                }
-
-                sourceToMatch = precursorType.MakeGenericType(parameters);
-            }
-
-            if (pipelineTarget.InputType != sourceToMatch)
-            {
-                throw new PipelineBuilderException($"Expects input type {sourceToMatch.FullName} but found {pipelineTarget.InputType.FullName}.");
+                throw new PipelineBuilderException($"Expects input type {sourceToMatch.FullName} but found {targetToMatch.FullName}.");
             }
         }
 

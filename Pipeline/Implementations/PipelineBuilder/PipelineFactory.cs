@@ -10,20 +10,28 @@
         private readonly Func<Type, Type, IPipelineAction> actionFactory;
         private readonly Func<Type, Type, Type, IPipelineTransformation> transformationFactory;
         private readonly Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory;
+        private readonly Func<Type, Type, IPipelineJoin> joinFactory;
 
         public PipelineFactory(
             Func<Type, Type, IPipelineAction> actionFactory, 
             Func<Type, Type, Type, IPipelineTransformation> transformationFactory, 
-            Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory)
+            Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory, 
+            Func<Type, Type, IPipelineJoin> joinFactory)
         {
             this.actionFactory = actionFactory ?? throw new ArgumentNullException(nameof(actionFactory));
             this.transformationFactory = transformationFactory ?? throw new ArgumentNullException(nameof(transformationFactory));
             this.linkFactory = linkFactory ?? throw new ArgumentNullException(nameof(linkFactory));
+            this.joinFactory = joinFactory ?? throw new ArgumentNullException(nameof(joinFactory));
         }
 
         public IPipelineLink CreateLink(bool isDefault, IPipelineSource source, IPipelineTarget target)
         {
             return linkFactory(isDefault, source, target);
+        }
+
+        public IPipelineJoin CreateJoin(Type source1, Type source2)
+        {
+            return joinFactory(source1, source2);
         }
 
         public IPipelineTarget CreateStep<TStep>()
