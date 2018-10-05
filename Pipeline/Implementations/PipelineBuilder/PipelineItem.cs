@@ -20,22 +20,12 @@
 
         public void AddLink(IPipelineLink pipelineLink)
         {
-            if(links.Count == 0 && !pipelineLink.IsDefault )
-            {
-                throw new PipelineBuilderException("The first link must be default");
-            }
-
-            if (links.Count > 0 && pipelineLink.IsDefault)
-            {
-                throw new PipelineBuilderException("Can't add more than one default link");
-            }
-
-            if ( links.Any( x => x.IsDefault ) )
-            {
-                links.RemoveAll(x => x.IsDefault);
-            }
-            
             links.Add(pipelineLink);
+        }
+
+        public void RemoveLink(IPipelineLink pipelineLink)
+        {
+            links.Remove(pipelineLink);
         }
     }
 }

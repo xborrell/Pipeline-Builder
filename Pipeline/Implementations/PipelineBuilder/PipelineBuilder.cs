@@ -56,6 +56,13 @@
 
             var transformation = transformations.OfType<IPipelineTransformation>().First(t => t.Name == name);
 
+            var lastLink = lastItem.Links.FirstOrDefault();
+
+            if (lastLink != null && lastLink.IsDefault)
+            {
+                lastItem.RemoveLink(lastLink);
+            }
+
             lastItem.AddLink(factory.CreateLink(false, transformation, lastItem));
 
 

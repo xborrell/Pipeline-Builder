@@ -7,5 +7,6 @@
     {
         IEnumerable<IPipelineLink> Links { get; }
         void AddLink(IPipelineLink pipelineLink);
+        void RemoveLink(IPipelineLink pipelineLink);
     }
 }

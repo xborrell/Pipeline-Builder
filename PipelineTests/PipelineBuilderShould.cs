@@ -5,24 +5,39 @@
     using NSubstitute;
     using Pipeline;
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Xunit;
 
     public class PipelineBuilderShould
     {
         private readonly IPipelineFactory factory;
+        private readonly PipelineAction intAction;
+        private readonly PipelineAction stringAction1;
+        private readonly PipelineAction stringAction2;
+        private readonly PipelineAction tupla2Action;
+        private readonly PipelineTransformation intTransformation;
+        private readonly PipelineTransformation intToStringTransformation;
+        private readonly PipelineTransformation stringTransformation;
 
         public PipelineBuilderShould()
         {
+            intAction = new PipelineAction(typeof(IIntAction), typeof(int));
+            stringAction1= new PipelineAction(typeof(IStringAction), typeof(string));
+            stringAction2 = new PipelineAction(typeof(IStringAction), typeof(string));
+            intTransformation = new PipelineTransformation(typeof(IIntTransformation), typeof(int), typeof(int));
+            intToStringTransformation = new PipelineTransformation(typeof(IIntToStringTransformation), typeof(int), typeof(string));
+            stringTransformation = new PipelineTransformation(typeof(IStringTransformation), typeof(string), typeof(string));
+            tupla2Action = new PipelineAction(typeof(ITupla2Action), typeof(Tuple<int, string>));
+            
             factory = Substitute.For<IPipelineFactory>();
-
             factory.CreateStep<IRejectableTransformation>().Returns(x => Substitute.For<IPipelineTarget>());
-            factory.CreateStep<IIntAction>().Returns(x => new PipelineAction(typeof(IIntAction), typeof(int)));
-            factory.CreateStep<IStringAction>().Returns(x => new PipelineAction(typeof(IStringAction), typeof(string)));
-            factory.CreateStep<IIntTransformation>().Returns(x => new PipelineTransformation(typeof(IIntTransformation), typeof(int), typeof(int)));
-            factory.CreateStep<IIntToStringTransformation>().Returns(x => new PipelineTransformation(typeof(IIntToStringTransformation), typeof(int), typeof(string)));
-            factory.CreateStep<IStringTransformation>().Returns(x => new PipelineTransformation(typeof(IStringTransformation), typeof(string), typeof(string)));
-            factory.CreateStep<ITupla2Action>().Returns(x => new PipelineAction(typeof(ITupla2Action), typeof(Tuple<int, string>)));
+            factory.CreateStep<IIntAction>().Returns(intAction);
+            factory.CreateStep<IStringAction>().Returns(stringAction1, stringAction2);
+            factory.CreateStep<IIntTransformation>().Returns(intTransformation);
+            factory.CreateStep<IIntToStringTransformation>().Returns(intToStringTransformation);
+            factory.CreateStep<IStringTransformation>().Returns(stringTransformation);
+            factory.CreateStep<ITupla2Action>().Returns(tupla2Action);
 
             factory.CreateLink(Arg.Any<bool>(), Arg.Any<IPipelineSource>(), Arg.Any<IPipelineTarget>()).Returns(x =>
             {
@@ -170,9 +185,9 @@
         public void AcceptsStepWhenbuildAndTheTypeMatchTheLastTransformation()
         {
             var pipeline = new PipelineBuilder<int>(factory)
-                .AddTransformation<IIntToStringTransformation>()
-                .AddAction<IStringAction>()
-                .AddAction<IStringAction>()
+                    .AddTransformation<IIntToStringTransformation>()
+                    .AddAction<IStringAction>()
+                    .AddAction<IStringAction>()
                 ;
 
             //Action
@@ -180,6 +195,23 @@
 
             //Assert
             acc.Should().NotThrow<PipelineBuilderException>();
+        }
+
+        [Fact]
+        public void CreateDefaultLink()
+        {
+            var pipeline = new PipelineBuilder<int>(factory)
+                    .AddTransformation<IIntTransformation>()
+                    .AddAction<IIntAction>()
+                ;
+
+            //Action
+            pipeline.Build();
+
+            //Assert
+            intAction.Links.Count().Should().Be(1);
+            var link = intAction.Links.First();
+            link.IsDefault.Should().BeTrue();
         }
 
         [Fact]
@@ -194,10 +226,13 @@
                 ;
 
             //Action
-            Action acc = () => pipeline.Build();
+            pipeline.Build();
 
             //Assert
-            acc.Should().NotThrow<PipelineBuilderException>();
+            intAction.Links.Count().Should().Be(1);
+            var link = intAction.Links.First();
+            link.IsDefault.Should().BeFalse();
+            link.Source.Should().Be(intTransformation);
         }
 
         [Fact]

@@ -5,6 +5,7 @@
     using NSubstitute;
     using Pipeline;
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -68,7 +69,7 @@
         public void CallTheLinkFactoryToResolveLinks()
         {
             //arrange
-            var source = Substitute.For<IPipelineTransformation>();
+            var source = Substitute.For<IPipelineSource>();
             var target = Substitute.For<IPipelineTarget>();
 
             //Action
