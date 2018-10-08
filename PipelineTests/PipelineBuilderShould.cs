@@ -47,6 +47,15 @@
 
                 return new PipelineLink(isDefault, source, target);
             });
+
+            factory.CreateJoin(Arg.Any<Type>(), Arg.Any<Type>()).Returns(x =>
+                {
+                    var source1 = (Type)x[0];
+                    var source2 = (Type)x[1];
+
+                    return new PipelineJoin(source1, source2);
+                }
+            );
         }
 
         [Fact]
@@ -246,6 +255,25 @@
                     .AddAction<ITupla2Action>()
                     .LinkTo("name1")
                     .LinkTo("name2")
+                ;
+
+            //Action
+            pipeline.Build();
+
+            //Assert
+            tupla2Action.Links.Count().Should().Be(1);
+            var link = tupla2Action.Links.First();
+            link.Source.Should().BeAssignableTo<IPipelineJoin>();
+        }
+
+        [Fact]
+        public void ResolveStepsWithTwoOutputLinks()
+        {
+            var pipeline = new PipelineBuilder<int>(factory)
+                    .AddTransformation<IIntTransformation>("name1")
+                    .AddAction<IIntAction>()
+                    .AddTransformation<IIntToStringTransformation>()
+                    .LinkTo("name1")
                 ;
 
             //Action

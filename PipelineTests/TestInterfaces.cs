@@ -16,4 +16,6 @@
     internal interface IStringTransformation : ICompilerTransformation<string, string> { }
 
     internal interface IIntToStringTransformation : ICompilerTransformation<int, string> { }
+
+    internal interface ITuplaChained2 : ICompilerAction<Tuple<Tuple<int, string>, int>> { }
 }

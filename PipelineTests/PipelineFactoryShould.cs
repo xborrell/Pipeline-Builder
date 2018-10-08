@@ -16,6 +16,7 @@
         private readonly Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink> linkFactory;
         private readonly Func<Type, Type, IPipelineJoin> joinFactory;
         private readonly PipelineFactory factory;
+        private Func<Type, IPipelineFork> forkFactory;
 
         public PipelineFactoryShould()
         {
@@ -23,7 +24,8 @@
             transformationFactory = Substitute.For<Func<Type, Type, Type, IPipelineTransformation>>();
             linkFactory = Substitute.For<Func<bool, IPipelineSource, IPipelineTarget, IPipelineLink>>();
             joinFactory = Substitute.For<Func<Type, Type, IPipelineJoin>>();
-            factory = new PipelineFactory(actionFactory, transformationFactory, linkFactory, joinFactory);
+            forkFactory = Substitute.For<Func<Type, IPipelineFork>>();
+            factory = new PipelineFactory(actionFactory, transformationFactory, linkFactory, joinFactory, forkFactory);
         }
 
         [Fact]
@@ -79,6 +81,33 @@
 
             //Assert
             linkFactory(true, source, target).Received(1);
+        }
+
+        [Fact]
+        public void CallTheJoinFactoryToResolveJoins()
+        {
+            //arrange
+            var source1 = Substitute.For<Type>();
+            var source2 = Substitute.For<Type>();
+
+            //Action
+            factory.CreateJoin(source1, source2);
+
+            //Assert
+            joinFactory(source1, source2).Received(1);
+        }
+
+        [Fact]
+        public void CallTheForkFactoryToResolveForks()
+        {
+            //arrange
+            var source = Substitute.For<Type>();
+
+            //Action
+            factory.CreateFork(source);
+
+            //Assert
+            forkFactory(source).Received(1);
         }
     }
 }

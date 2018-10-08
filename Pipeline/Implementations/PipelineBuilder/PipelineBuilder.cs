@@ -72,10 +72,11 @@
 
             var join = factory.CreateJoin(lastLink.Source.OutputType, transformation.OutputType );
 
-            join.AddLink(factory.CreateLink(false, join, lastItem));
             join.AddLink(factory.CreateLink(false, lastLink.Source, join));
-            lastItem.RemoveLink(lastLink);
             join.AddLink(factory.CreateLink(false, transformation, join));
+
+            lastItem.RemoveLink(lastLink);
+            lastItem.AddLink(factory.CreateLink(false, join, lastItem));
 
             return this;
         }
