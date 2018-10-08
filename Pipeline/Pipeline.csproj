@@ -61,7 +61,6 @@
     <Compile Include="Implementations\PipelineBuilder\PipelineBuilder.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineFactory.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineJoin.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineItem.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineLink.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineFork.cs" />
     <Compile Include="Implementations\PipelineBuilder\PipelineTransformation.cs" />

@@ -84,6 +84,34 @@
         }
 
         [Fact]
+        public void LinkSourceWithLinkWhenCreateLinks()
+        {
+            //arrange
+            var source = Substitute.For<IPipelineSource>();
+            var target = Substitute.For<IPipelineTarget>();
+
+            //Action
+            factory.CreateLink(true, source, target);
+
+            //Assert
+            source.Received(1).AddOutputLink(Arg.Any<IPipelineLink>());
+        }
+
+        [Fact]
+        public void LinkTargetWithLinkWhenCreateLinks()
+        {
+            //arrange
+            var source = Substitute.For<IPipelineSource>();
+            var target = Substitute.For<IPipelineTarget>();
+
+            //Action
+            factory.CreateLink(true, source, target);
+
+            //Assert
+            target.Received(1).AddInputLink(Arg.Any<IPipelineLink>());
+        }
+
+        [Fact]
         public void CallTheJoinFactoryToResolveJoins()
         {
             //arrange

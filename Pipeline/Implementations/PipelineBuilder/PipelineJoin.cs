@@ -6,12 +6,17 @@
 
     public class PipelineJoin : IPipelineJoin
     {
+        private List<IPipelineLink> inputLinks = new List<IPipelineLink>();
+        private IPipelineLink outputLink;
+
         public Type InputType { get; }
         public Type InputType2 { get; }
         public Type OutputType { get; }
 
-        public IEnumerable<IPipelineLink> Links => links;
-        private List<IPipelineLink> links = new List<IPipelineLink>();
+
+        public IEnumerable<IPipelineLink> InputLinks => inputLinks;
+        public IEnumerable<IPipelineLink> OutputLinks => new[] { outputLink };
+
 
         public PipelineJoin(Type source1, Type source2)
         {
@@ -22,14 +27,40 @@
             OutputType = precursorType.MakeGenericType(source1, source2);
         }
 
-        public void AddLink(IPipelineLink pipelineLink)
+        public void AddInputLink(IPipelineLink pipelineLink)
         {
-            links.Add(pipelineLink);
+            if (pipelineLink.IsDefault)
+            {
+                throw new InvalidOperationException("Cannot assign input default link into join.");
+            }
+
+
+            inputLinks.Add(pipelineLink);
         }
 
-        public void RemoveLink(IPipelineLink pipelineLink)
+        public void RemoveInputLink(IPipelineLink pipelineLink)
         {
-            links.Remove(pipelineLink);
+            inputLinks.Remove(pipelineLink);
+        }
+
+        public void AddOutputLink(IPipelineLink pipelineLink)
+        {
+            if (outputLink != null)
+            {
+                throw new InvalidOperationException("Cannot replace the assigned output link.");
+            }
+
+            if (pipelineLink.IsDefault)
+            {
+                throw new InvalidOperationException("Cannot assign output default link into join.");
+            }
+
+            outputLink = pipelineLink;
+        }
+
+        public void RemoveOutputLink(IPipelineLink pipelineLink)
+        {
+            outputLink = null;
         }
     }
 }

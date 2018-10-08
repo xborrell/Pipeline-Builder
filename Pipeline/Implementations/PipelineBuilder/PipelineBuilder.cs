@@ -11,6 +11,8 @@
         private readonly List<IPipelineItem> transformations;
         private IPipelineTarget lastItem;
 
+        public IEnumerable<IPipelineItem> Transformations => transformations;
+
         public PipelineBuilder(IPipelineFactory factory)
         {
             transformations = new List<IPipelineItem>();
@@ -56,33 +58,15 @@
 
             var transformation = transformations.OfType<IPipelineTransformation>().First(t => t.Name == name);
 
-            var lastLink = lastItem.Links.FirstOrDefault();
-            if (lastLink == null)
-            {
-                throw new InvalidOperationException("Missing Default link");
-            }
-
-            if (lastLink.IsDefault)
-            {
-                lastItem.RemoveLink(lastLink);
-                lastItem.AddLink(factory.CreateLink(false, transformation, lastItem));
-
-                return this;
-            }
-
-            var join = factory.CreateJoin(lastLink.Source.OutputType, transformation.OutputType );
-
-            join.AddLink(factory.CreateLink(false, lastLink.Source, join));
-            join.AddLink(factory.CreateLink(false, transformation, join));
-
-            lastItem.RemoveLink(lastLink);
-            lastItem.AddLink(factory.CreateLink(false, join, lastItem));
+            factory.CreateLink(false, transformation, lastItem);
 
             return this;
         }
 
         public IDataflowPipeline<TInput> Build()
         {
+            ResolveJoins();
+
             foreach (var pipelineItem in transformations)
             {
                 CheckPipelineItem((dynamic)pipelineItem);
@@ -91,59 +75,32 @@
             return null;
         }
 
-        private void CheckPipelineItem(IPipelineItem item)
+        private void ResolveJoins()
         {
-            throw new NotImplementedException();
-        }
+            var joinCandidates = from transformation in transformations.OfType<IPipelineTarget>()
+                                 where transformation.InputLinks.Count() > 1
+                                 select transformation;
+            ;
 
-        private void CheckPipelineItem(IPipelineJoin join)
-        {
-            var numberOfLinks = join.Links.Count();
-
-            if (numberOfLinks != 2)
+            foreach (var target in joinCandidates.ToList())
             {
-                throw new InvalidOperationException();
-            }
-            
-            var source1ToMatch = join.Links.First().Source.OutputType;
-            var target1ToMatch = join.InputType;
+                var types = from link in target.InputLinks select link.Source.OutputType;
 
-            CheckTypes(source1ToMatch, target1ToMatch);
+                var join = factory.CreateJoin(types.ToArray());
 
-            var source2ToMatch = join.Links.First().Source.OutputType;
-            var target2ToMatch = join.InputType2;
+                var targetLinks = new List<IPipelineLink>(target.InputLinks);
 
-            CheckTypes(source2ToMatch, target2ToMatch);
-        }
+                foreach (var link in targetLinks)
+                {
+                    target.RemoveInputLink(link);
 
-        private void CheckPipelineItem(IPipelineAction action)
-        {
-            var sourceToMatch = !action.Links.Any()
-                ? typeof(TInput)
-                : action.Links.First().Source.OutputType;
+                    var source = link.Source;
 
-            var targetToMatch = action.InputType;
+                    factory.CreateLink(false, source, join);
+                }
+                factory.CreateLink(false, join, target);
 
-            CheckTypes(sourceToMatch, targetToMatch);
-        }
-
-        private void CheckPipelineItem(IPipelineTransformation transformation)
-        {
-
-            var sourceToMatch = !transformation.Links.Any()
-                ? typeof(TInput)
-                : transformation.Links.First().Source.OutputType;
-
-            var targetToMatch = transformation.InputType;
-
-            CheckTypes(sourceToMatch, targetToMatch);
-        }
-
-        private void CheckTypes(Type sourceToMatch, Type targetToMatch)
-        {
-            if (sourceToMatch != targetToMatch)
-            {
-                throw new PipelineBuilderException($"Expects input type {sourceToMatch.FullName} but found {targetToMatch.FullName}.");
+                transformations.Add(join);
             }
         }
 
@@ -157,7 +114,7 @@
 
                 if (transformations[pos] is IPipelineTransformation transformation)
                 {
-                    item.AddLink(factory.CreateLink(true, transformation, item));
+                    factory.CreateLink(true, transformation, item);
                     break;
                 }
             }
@@ -168,6 +125,61 @@
             transformations.Add(pipelineItem);
             LinkByDefault(pipelineItem);
             lastItem = pipelineItem;
+        }
+
+        private void CheckPipelineItem(IPipelineItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CheckPipelineItem(IPipelineJoin join)
+        {
+            var numberOfLinks = join.InputLinks.Count();
+
+            if (numberOfLinks != 2)
+            {
+                throw new InvalidOperationException();
+            }
+
+            var source1ToMatch = join.InputLinks.First().Source.OutputType;
+            var target1ToMatch = join.InputType;
+
+            CheckTypes(source1ToMatch, target1ToMatch);
+
+            var source2ToMatch = join.InputLinks.Last().Source.OutputType;
+            var target2ToMatch = join.InputType2;
+
+            CheckTypes(source2ToMatch, target2ToMatch);
+        }
+
+        private void CheckPipelineItem(IPipelineAction action)
+        {
+            var sourceToMatch = !action.InputLinks.Any()
+                ? typeof(TInput)
+                : action.InputLinks.First().Source.OutputType;
+
+            var targetToMatch = action.InputType;
+
+            CheckTypes(sourceToMatch, targetToMatch);
+        }
+
+        private void CheckPipelineItem(IPipelineTransformation transformation)
+        {
+            var sourceToMatch = !transformation.InputLinks.Any()
+                ? typeof(TInput)
+                : transformation.InputLinks.First().Source.OutputType;
+
+            var targetToMatch = transformation.InputType;
+
+            CheckTypes(sourceToMatch, targetToMatch);
+        }
+
+        private void CheckTypes(Type sourceToMatch, Type targetToMatch)
+        {
+            if (sourceToMatch != targetToMatch)
+            {
+                throw new PipelineBuilderException($"Expects input type {sourceToMatch.FullName} but found {targetToMatch.FullName}.");
+            }
         }
     }
 }

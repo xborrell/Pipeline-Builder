@@ -1,7 +1,11 @@
 ﻿namespace Pipeline
 {
+    using System.Collections.Generic;
+
     public interface IPipelineBuilder<TInput>
     {
+        IEnumerable<IPipelineItem> Transformations { get; }
+
         IDataflowPipeline<TInput> Build();
         IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerTransformation;
         IPipelineBuilder<TInput> AddAction<TStep>() where TStep : ICompilerTransformation;

@@ -60,8 +60,11 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DataflowPipelineShould.cs" />
+    <Compile Include="PipelineForkShould.cs" />
+    <Compile Include="PipelineJoinShould.cs" />
+    <Compile Include="PipelineTransformationShould.cs" />
     <Compile Include="PipelineBuilderShould.cs" />
-    <Compile Include="PipelineItemShould.cs" />
+    <Compile Include="PipelineActionShould.cs" />
     <Compile Include="TestInterfaces.cs" />
     <Compile Include="PipelineFactoryShould.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

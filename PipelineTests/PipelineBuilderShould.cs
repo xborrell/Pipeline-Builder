@@ -45,13 +45,20 @@
                 var source = x.Arg<IPipelineSource>();
                 var target = x.Arg<IPipelineTarget>();
 
-                return new PipelineLink(isDefault, source, target);
+                var link = new PipelineLink(isDefault, source, target);
+
+                source.AddOutputLink(link);
+                target.AddInputLink(link);
+
+                return link;
             });
 
-            factory.CreateJoin(Arg.Any<Type>(), Arg.Any<Type>()).Returns(x =>
+            factory.CreateJoin(Arg.Any<Type[]>()).Returns(x =>
                 {
-                    var source1 = (Type)x[0];
-                    var source2 = (Type)x[1];
+                    var sources = (Type[])x[0];
+
+                    var source1 = sources[0];
+                    var source2 = sources[1];
 
                     return new PipelineJoin(source1, source2);
                 }
@@ -218,8 +225,8 @@
             pipeline.Build();
 
             //Assert
-            intAction.Links.Count().Should().Be(1);
-            var link = intAction.Links.First();
+            intAction.InputLinks.Count().Should().Be(1);
+            var link = intAction.InputLinks.First();
             link.IsDefault.Should().BeTrue();
         }
 
@@ -238,20 +245,19 @@
             pipeline.Build();
 
             //Assert
-            intAction.Links.Count().Should().Be(1);
-            var link = intAction.Links.First();
+            intAction.InputLinks.Count().Should().Be(1);
+            var link = intAction.InputLinks.First();
             link.IsDefault.Should().BeFalse();
             link.Source.Should().Be(intTransformation);
         }
 
         [Fact]
-        public void ResolveStepsWithTwoLinks()
+        public void InsertJoinWhenTwoInputLinksExists()
         {
             var pipeline = new PipelineBuilder<int>(factory)
                     .AddTransformation<IIntTransformation>("name1")
                     .AddTransformation<IIntToStringTransformation>()
                     .AddTransformation<IStringTransformation>("name2")
-                    .AddAction<IStringAction>()
                     .AddAction<ITupla2Action>()
                     .LinkTo("name1")
                     .LinkTo("name2")
@@ -261,28 +267,132 @@
             pipeline.Build();
 
             //Assert
-            tupla2Action.Links.Count().Should().Be(1);
-            var link = tupla2Action.Links.First();
-            link.Source.Should().BeAssignableTo<IPipelineJoin>();
+            var joinsEnumeration = from transformation in pipeline.Transformations.OfType<IPipelineJoin>() select transformation;
+            var join = joinsEnumeration.First();
+
+            join.Should().NotBeNull();
         }
 
         [Fact]
-        public void ResolveStepsWithTwoOutputLinks()
+        public void ResolveTheJoinTypes()
         {
             var pipeline = new PipelineBuilder<int>(factory)
                     .AddTransformation<IIntTransformation>("name1")
-                    .AddAction<IIntAction>()
                     .AddTransformation<IIntToStringTransformation>()
+                    .AddTransformation<IStringTransformation>("name2")
+                    .AddAction<ITupla2Action>()
                     .LinkTo("name1")
+                    .LinkTo("name2")
                 ;
 
             //Action
             pipeline.Build();
 
             //Assert
-            tupla2Action.Links.Count().Should().Be(1);
-            var link = tupla2Action.Links.First();
-            link.Source.Should().BeAssignableTo<IPipelineJoin>();
+            var joinsEnumeration = from transformation in pipeline.Transformations.OfType<IPipelineJoin>() select transformation;
+            var join = joinsEnumeration.First();
+
+            join.InputType.Should().Be(intTransformation.OutputType);
+            join.InputType2.Should().Be(stringTransformation.OutputType);
+            join.OutputType.Should().Be(tupla2Action.InputType);
         }
+
+        [Fact]
+        public void ResolveTheJoinLinks()
+        {
+            var pipeline = new PipelineBuilder<int>(factory)
+                    .AddTransformation<IIntTransformation>("name1")
+                    .AddTransformation<IIntToStringTransformation>()
+                    .AddTransformation<IStringTransformation>("name2")
+                    .AddAction<ITupla2Action>()
+                    .LinkTo("name1")
+                    .LinkTo("name2")
+                ;
+
+            //Action
+            pipeline.Build();
+
+            //Assert
+            var joinsEnumeration = from transformation in pipeline.Transformations.OfType<IPipelineJoin>() select transformation;
+            var join = joinsEnumeration.First();
+
+
+
+            join.InputLinks.First().Source.Should().Be(intTransformation);
+            join.InputLinks.Last().Source.Should().Be(stringTransformation);
+            join.OutputLinks.First().Target.Should().Be(tupla2Action);
+        }
+
+        //[Fact]
+        //public void InsertJoinWhenTwoInputLinksExists()
+        //{
+        //    var pipeline = new PipelineBuilder<int>(factory)
+        //            .AddTransformation<IIntTransformation>("name1")
+        //            .AddTransformation<IIntToStringTransformation>()
+        //            .AddTransformation<IStringTransformation>("name2")
+        //            .AddAction<ITupla2Action>()
+        //            .LinkTo("name1")
+        //            .LinkTo("name2")
+        //        ;
+
+        //    //Action
+        //    pipeline.Build();
+
+        //    //Assert
+        //    var joinsEnumeration = from transformation in pipeline.Transformations.OfType<IPipelineJoin>() select transformation;
+        //    var join = joinsEnumeration.First();
+
+        //    join.Should().NotBeNull();
+        //    join.InputType.Should().Be(intTransformation.OutputType);
+        //    join.InputType2.Should().Be(intToStringTransformation.OutputType);
+        //    join.OutputType.Should().Be(tupla2Action.InputType);
+
+
+
+        //    tupla2Action.InputLinks.Count().Should().Be(1);
+        //    var link = tupla2Action.InputLinks.First();
+        //    link.Source.Should().BeAssignableTo<IPipelineJoin>();
+        //}
+
+        //[Fact]
+        //public void ResolveStepsWithTwoLinks()
+        //{
+        //    var pipeline = new PipelineBuilder<int>(factory)
+        //            .AddTransformation<IIntTransformation>("name1")
+        //            .AddTransformation<IIntToStringTransformation>()
+        //            .AddTransformation<IStringTransformation>("name2")
+        //            .AddAction<IStringAction>()
+        //            .AddAction<ITupla2Action>()
+        //            .LinkTo("name1")
+        //            .LinkTo("name2")
+        //        ;
+
+        //    //Action
+        //    pipeline.Build();
+
+        //    //Assert
+        //    tupla2Action.InputLinks.Count().Should().Be(1);
+        //    var link = tupla2Action.InputLinks.First();
+        //    link.Source.Should().BeAssignableTo<IPipelineJoin>();
+        //}
+
+        //[Fact]
+        //public void ResolveStepsWithTwoOutputLinks()
+        //{
+        //    var pipeline = new PipelineBuilder<int>(factory)
+        //            .AddTransformation<IIntTransformation>("name1")
+        //            .AddAction<IIntAction>()
+        //            .AddTransformation<IIntToStringTransformation>()
+        //            .LinkTo("name1")
+        //        ;
+
+        //    //Action
+        //    pipeline.Build();
+
+        //    //Assert
+        //    tupla2Action.InputLinks.Count().Should().Be(1);
+        //    var link = tupla2Action.InputLinks.First();
+        //    link.Source.Should().BeAssignableTo<IPipelineJoin>();
+        //}
     }
 }

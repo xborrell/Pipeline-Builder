@@ -29,12 +29,22 @@
 
         public IPipelineLink CreateLink(bool isDefault, IPipelineSource source, IPipelineTarget target)
         {
-            return linkFactory(isDefault, source, target);
+            var link = linkFactory(isDefault, source, target);
+
+            source.AddOutputLink(link);
+            target.AddInputLink(link);
+
+            return link;
         }
 
-        public IPipelineJoin CreateJoin(Type source1, Type source2)
+        public IPipelineJoin CreateJoin( params Type[] sources)
         {
-            return joinFactory(source1, source2);
+            if (sources.Length != 2)
+            {
+                throw new NotImplementedException();
+            }
+
+            return joinFactory(sources[0], sources[1]);
         }
 
         public IPipelineFork CreateFork(Type source)
