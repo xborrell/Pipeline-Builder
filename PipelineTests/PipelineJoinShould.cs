@@ -12,41 +12,10 @@
     public class PipelineJoinShould
     {
         [Fact]
-        public void StoreInputTypes()
-        {
-            // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-
-            //action
-            var item = new PipelineJoin(inputType1, inputType2);
-
-            //assert
-            item.InputType.Should().Be(inputType1);
-            item.InputType2.Should().Be(inputType2);
-        }
-
-        [Fact]
-        public void StoreOutputType()
-        {
-            // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-
-            //action
-            var item = new PipelineJoin(inputType1, inputType2);
-
-            //assert
-            item.OutputType.Should().Be(typeof(Tuple<int,int>));
-        }
-
-        [Fact]
         public void RejectsDefaultInputLink()
         {
             // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-            var item = new PipelineJoin(inputType1, inputType2);
+            var item = new PipelineJoin();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -61,9 +30,7 @@
         public void StoreNormalInputLink()
         {
             // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-            var item = new PipelineJoin(inputType1, inputType2);
+            var item = new PipelineJoin();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -79,9 +46,7 @@
         public void StoreTwoNormalInputLink()
         {
             // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-            var item = new PipelineJoin(inputType1, inputType2);
+            var item = new PipelineJoin();
             var link1 = Substitute.For<IPipelineLink>();
             link1.IsDefault.Returns(false);
             var link2 = Substitute.For<IPipelineLink>();
@@ -101,9 +66,7 @@
         public void RejectsDefaultOutputLink()
         {
             // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-            var item = new PipelineJoin(inputType1, inputType2);
+            var item = new PipelineJoin();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -118,9 +81,7 @@
         public void StoreNormalOutputLink()
         {
             // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-            var item = new PipelineJoin(inputType1, inputType2);
+            var item = new PipelineJoin();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -136,9 +97,7 @@
         public void RejectsNormalOutputLinkOverAnotherLink()
         {
             // arrange
-            var inputType1 = typeof(int);
-            var inputType2 = typeof(int);
-            var item = new PipelineJoin(inputType1, inputType2);
+            var item = new PipelineJoin();
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddOutputLink(normalLink1);

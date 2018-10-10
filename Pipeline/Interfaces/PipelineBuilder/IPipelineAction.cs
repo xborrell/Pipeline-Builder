@@ -1,6 +1,8 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineAction : IPipelineTarget
+    using System;
+
+    public interface IPipelineAction : IPipelineTarget, IPipelineStep
     {
     }
 }

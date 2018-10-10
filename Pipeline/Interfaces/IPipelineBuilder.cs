@@ -4,7 +4,7 @@
 
     public interface IPipelineBuilder<TInput>
     {
-        IEnumerable<IPipelineItem> Transformations { get; }
+        IEnumerable<IPipelineItem> Items { get; }
 
         IDataflowPipeline<TInput> Build();
         IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerTransformation;

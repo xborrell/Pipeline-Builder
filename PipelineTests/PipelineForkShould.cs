@@ -12,37 +12,10 @@
     public class PipelineForkShould
     {
         [Fact]
-        public void StoreInputType()
-        {
-            // arrange
-            var inputType = typeof(int);
-
-            //action
-            var item = new PipelineFork(inputType);
-
-            //assert
-            item.InputType.Should().Be(inputType);
-        }
-
-        [Fact]
-        public void StoreOutputType()
-        {
-            // arrange
-            var inputType = typeof(int);
-
-            //action
-            var item = new PipelineFork(inputType);
-
-            //assert
-            item.OutputType.Should().Be(inputType);
-        }
-
-        [Fact]
         public void RejectsDefaultInputLink()
         {
             // arrange
-            var inputType = typeof(int);
-            var item = new PipelineFork(inputType);
+            var item = new PipelineFork();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -57,8 +30,7 @@
         public void StoreNormalInputLink()
         {
             // arrange
-            var inputType = typeof(int);
-            var item = new PipelineFork(inputType);
+            var item = new PipelineFork();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -74,8 +46,7 @@
         public void RejectsNormalInputLinkOverAnotherLink()
         {
             // arrange
-            var inputType = typeof(int);
-            var item = new PipelineFork(inputType);
+            var item = new PipelineFork();
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddInputLink(normalLink1);
@@ -91,27 +62,10 @@
         }
 
         [Fact]
-        public void RejectsDefaultOutputLink()
-        {
-            // arrange
-            var inputType = typeof(int);
-            var item = new PipelineFork(inputType);
-            var link = Substitute.For<IPipelineLink>();
-            link.IsDefault.Returns(true);
-
-            //action
-            Action acc = () => item.AddOutputLink(link);
-
-            //assert
-            acc.Should().Throw<Exception>();
-        }
-
-        [Fact]
         public void StoreNormalOutputLink()
         {
             // arrange
-            var inputType = typeof(int);
-            var item = new PipelineFork(inputType);
+            var item = new PipelineFork();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -127,8 +81,7 @@
         public void StoreTwoNormalOutputLinks()
         {
             // arrange
-            var inputType = typeof(int);
-            var item = new PipelineFork(inputType);
+            var item = new PipelineFork();
             var link1 = Substitute.For<IPipelineLink>();
             link1.IsDefault.Returns(false);
             var link2 = Substitute.For<IPipelineLink>();

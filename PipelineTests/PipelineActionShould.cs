@@ -16,27 +16,12 @@
         {
             // arrange
             var stepType = typeof(IIntAction);
-            var inputType = typeof(int);
 
             //action
-            var item = new PipelineAction(stepType, inputType);
+            var item = new PipelineAction(stepType);
 
             //assert
             item.Step.Should().Be(stepType);
-        }
-
-        [Fact]
-        public void StoreInputType()
-        {
-            // arrange
-            var stepType = typeof(IIntAction);
-            var inputType = typeof(int);
-
-            //action
-            var item = new PipelineAction(stepType, inputType);
-
-            //assert
-            item.InputType.Should().Be(inputType);
         }
 
         [Fact]
@@ -44,8 +29,7 @@
         {
             // arrange
             var stepType = typeof(IIntAction);
-            var inputType = typeof(int);
-            var item = new PipelineAction(stepType, inputType);
+            var item = new PipelineAction(stepType);
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -62,8 +46,7 @@
         {
             // arrange
             var stepType = typeof(IIntAction);
-            var inputType = typeof(int);
-            var item = new PipelineAction(stepType, inputType);
+            var item = new PipelineAction(stepType);
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -80,11 +63,12 @@
         {
             // arrange
             var stepType = typeof(IIntAction);
-            var inputType = typeof(int);
-            var item = new PipelineAction(stepType, inputType);
+            var item = new PipelineAction(stepType);
             var defaultLink = Substitute.For<IPipelineLink>();
             defaultLink.IsDefault.Returns(true);
             item.AddInputLink(defaultLink);
+
+            defaultLink.When(x => x.Remove()).Do(x => item.RemoveInputLink(defaultLink));
 
             var normalLink = Substitute.For<IPipelineLink>();
             normalLink.IsDefault.Returns(false);
@@ -102,9 +86,7 @@
         {
             // arrange
             var stepType = typeof(IIntAction);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineAction(stepType, inputType);
+            var item = new PipelineAction(stepType);
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddInputLink(normalLink1);

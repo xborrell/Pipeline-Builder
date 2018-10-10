@@ -4,28 +4,13 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class PipelineJoin : IPipelineJoin
+    public class PipelineJoin : PipelineItem, IPipelineJoin
     {
-        private List<IPipelineLink> inputLinks = new List<IPipelineLink>();
+        private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
         private IPipelineLink outputLink;
-
-        public Type InputType { get; }
-        public Type InputType2 { get; }
-        public Type OutputType { get; }
-
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
         public IEnumerable<IPipelineLink> OutputLinks => new[] { outputLink };
-
-
-        public PipelineJoin(Type source1, Type source2)
-        {
-            this.InputType = source1 ?? throw new ArgumentNullException(nameof(source1));
-            this.InputType2 = source2 ?? throw new ArgumentNullException(nameof(source2));
-
-            var precursorType = typeof(Tuple<,>);
-            OutputType = precursorType.MakeGenericType(source1, source2);
-        }
 
         public void AddInputLink(IPipelineLink pipelineLink)
         {
@@ -62,5 +47,11 @@
         {
             outputLink = null;
         }
+
+        public override string ToString()
+        {
+            return "Join";
+        }
+
     }
 }

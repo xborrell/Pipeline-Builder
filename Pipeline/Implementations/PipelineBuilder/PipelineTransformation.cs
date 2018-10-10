@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class PipelineTransformation : IPipelineTransformation
+    public class PipelineTransformation : PipelineItem, IPipelineTransformation
     {
         private List<IPipelineLink> inputLinks = new List<IPipelineLink>();
         private List<IPipelineLink> outputLinks = new List<IPipelineLink>();
@@ -86,28 +86,10 @@
         {
             Name = name.ToLower();
         }
-
-        private void AddLink( string description, List<IPipelineLink> links, IPipelineLink pipelineLink)
+        
+        public override string ToString()
         {
-            if (!links.Any())
-            {
-                links.Add( pipelineLink );
-                return;
-            }
-
-            if (pipelineLink.IsDefault)
-            {
-                throw new InvalidOperationException($"Cannot assign {description} default link into linked transformation.");
-            }
-
-            var first = links.First();
-
-            if (first.IsDefault)
-            {
-                links.Remove(first);
-            }
-
-            links.Add( pipelineLink );
+            return $"Transformation<{Step.Name}>";
         }
     }
 }

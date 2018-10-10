@@ -4,11 +4,10 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class PipelineAction : IPipelineAction
+    public class PipelineAction : PipelineItem, IPipelineAction
     {
-        private List<IPipelineLink> inputLinks = new List<IPipelineLink>();
+        private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
 
-        public Type InputType { get; }
         public Type Step { get; }
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
@@ -30,7 +29,7 @@
 
             if (first.IsDefault)
             {
-                inputLinks.Remove(first);
+                first.Remove();
             }
 
             inputLinks.Add( pipelineLink );
@@ -41,10 +40,14 @@
             inputLinks.Remove(pipelineLink);
         }
         
-        public PipelineAction(Type step, Type inputType)
+        public PipelineAction(Type step)
         {
             Step = step ?? throw new ArgumentNullException(nameof(step));
-            InputType = inputType ?? throw new ArgumentNullException(nameof(inputType));
+        }
+
+        public override string ToString()
+        {
+            return $"Action<{Step.Name}>";
         }
     }
 }

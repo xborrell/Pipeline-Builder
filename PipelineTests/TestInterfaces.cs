@@ -1,21 +1,22 @@
 ﻿namespace Pipeline.Unit.Tests
 {
     using System;
+    using System.Threading.Tasks;
     using Pipeline;
 
-    internal interface IRejectableTransformation : ICompilerTransformation { }
+    public  interface IRejectableTransformation : ICompilerTransformation { }
 
-    internal interface IIntAction : ICompilerAction<int> { }
+    public  interface IIntAction : ICompilerAction<int> { }
 
-    internal interface IStringAction : ICompilerAction<string> { }
+    public  interface IStringAction : ICompilerAction<string> { }
 
-    internal interface ITupla2Action : ICompilerAction<Tuple<int, string>> { }
+    public  interface ITupla2Action : ICompilerAction<Tuple<int, string>> { }
 
-    internal interface IIntTransformation : ICompilerTransformation<int, int> { }
+    public  interface IIntTransformation : ICompilerTransformation<int, int> { }
 
-    internal interface IStringTransformation : ICompilerTransformation<string, string> { }
+    public  interface IStringTransformation : ICompilerTransformation<string, string> { }
 
-    internal interface IIntToStringTransformation : ICompilerTransformation<int, string> { }
+    public  interface IIntToStringTransformation : ICompilerTransformation<int, string> { }
 
-    internal interface ITuplaChained2 : ICompilerAction<Tuple<Tuple<int, string>, int>> { }
+    public interface ITuplaChained2 : ICompilerAction<Tuple<Tuple<int, string>, int>> { }
 }
