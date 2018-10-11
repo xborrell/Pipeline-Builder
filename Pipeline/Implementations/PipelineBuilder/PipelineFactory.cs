@@ -44,7 +44,7 @@
             return scope.Resolve<TCompilerStep>();
         }
 
-        public IPipelineTarget CreateAction<TStep>()
+        public IPipelineAction<TStep, TIn> CreateAction<TStep, TIn>() where TStep : ICompilerAction<TIn>
         {
             var step = typeof(TStep);
 
@@ -57,10 +57,10 @@
                 throw new PipelineBuilderException($"{step.Name} is not an action.");
             }
 
-            return scope.Resolve<IPipelineAction>(new PositionalParameter(0, step));
+            return scope.Resolve<IPipelineAction<TStep, TIn>>();
         }
 
-        public IPipelineTarget CreateTransformation<TStep>()
+        public IPipelineTransformation<TStep, TIn, TOut> CreateTransformation<TStep, TIn, TOut>() where TStep : ICompilerTransformation<TIn, TOut>
         {
             var step = typeof(TStep);
             var interfacesImplemented = step.GetInterfaces();
@@ -72,7 +72,7 @@
                 throw new PipelineBuilderException($"{step.Name} is not a transformation.");
             }
 
-            return scope.Resolve<IPipelineTransformation>(new PositionalParameter(0, step));
+            return scope.Resolve<IPipelineTransformation<TStep, TIn, TOut>>();
         }
     }
 }

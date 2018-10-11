@@ -1,9 +1,6 @@
 ﻿namespace Pipeline
 {
-    using System;
-
-    public interface IPipelineStep : IPipelineItem
+    public interface IPipelineStep<TStep> : IPipelineItem
     {
-        Type Step { get; }
     }
 }

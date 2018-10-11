@@ -1,22 +1,12 @@
 ﻿namespace Pipeline
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks.Dataflow;
 
     public abstract class PipelineItem : IPipelineItem
     {
-        public IDataflowBlock Block { get; private set; }
-
-        public void AddBlock(IDataflowBlock block)
-        {
-            if (Block != null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            Block = block;
-        }
+        public IDataflowBlock Block { get; protected set; }
+        public abstract void ResolveLinkTypes(bool firstItem, Type firstType);
+        public abstract void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory);
     }
 }

@@ -3,28 +3,19 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks.Dataflow;
 
-    public class PipelineTransformation : PipelineItem, IPipelineTransformation
+    public class PipelineTransformation<TStep, TInput, TOutput> : PipelineItem, IPipelineTransformation<TStep, TInput, TOutput> 
+        where TStep : ICompilerTransformation<TInput,TOutput>
     {
         private List<IPipelineLink> inputLinks = new List<IPipelineLink>();
         private List<IPipelineLink> outputLinks = new List<IPipelineLink>();
-
-        public Type InputType { get; }
-        public Type OutputType { get; }
-        public Type Step { get; }
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
         public IEnumerable<IPipelineLink> OutputLinks => outputLinks;
 
         public string Name { get; private set; }
         
-        public PipelineTransformation(Type step, Type inputType, Type outputType)
-        {
-            Step = step ?? throw new ArgumentNullException(nameof(step));
-            InputType = inputType ?? throw new ArgumentNullException(nameof(inputType));
-            OutputType = outputType ?? throw new ArgumentNullException(nameof(outputType));
-        }
-
         public void AddInputLink(IPipelineLink pipelineLink)
         {
             if (!inputLinks.Any())
@@ -89,7 +80,54 @@
         
         public override string ToString()
         {
-            return $"Transformation<{Step.Name}>";
+            return $"Transformation<{typeof(TStep).Name}>";
+        }
+ 
+        public override void ResolveLinkTypes(bool firstItem, Type firstType)
+        {
+            if (firstItem)
+            {
+                if (inputLinks.Count > 0)
+                {
+                    throw new PipelineBuilderException($"The first transformation cannot be connected to any other block.");
+                }
+
+                if (firstType != typeof(TInput))
+                {
+                    throw new PipelineBuilderException($"The type of first transformation must match the pipeline type.");
+                }
+            }
+            else
+            {
+                if (inputLinks.Count != 1)
+                {
+                    if (inputLinks.Count == 0)
+                    {
+                        throw new PipelineBuilderException($"Transformation without input link.");
+                    }
+
+                    throw new PipelineBuilderException($"Transformation with many input links.");
+                }
+
+                inputLinks[0].SetType(typeof(TInput));
+            }
+
+            if (outputLinks.Count != 1)
+            {
+                if (outputLinks.Count == 0)
+                {
+                    throw new PipelineBuilderException($"Transformation without output link.");
+                }
+                throw new PipelineBuilderException($"Transformation with many output links.");
+            }
+
+            outputLinks[0].SetType(typeof(TOutput));
+        }
+ 
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        {
+            var step = factory.CreateCompilerStep<TStep>();
+            Block = new TransformBlock<TInput, TOutput>(input => step.Ejecutar(input), pipeline.BlockOptions);
         }
     }
 }

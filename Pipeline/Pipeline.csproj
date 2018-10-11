@@ -79,6 +79,7 @@
     <Compile Include="Interfaces\PipelineBuilder\IDataflowPipeline.cs" />
     <Compile Include="Interfaces\IIoCRegister.cs" />
     <Compile Include="Interfaces\IPipelineBuilder.cs" />
+    <Compile Include="Interfaces\PipelineBuilder\IPipelineNamedSource.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineStep.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineAction.cs" />
     <Compile Include="Interfaces\PipelineBuilder\IPipelineFactory.cs" />

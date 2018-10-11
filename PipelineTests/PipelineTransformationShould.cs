@@ -12,58 +12,10 @@
     public class PipelineTransformationShould
     {
         [Fact]
-        public void StoreStepType()
-        {
-            // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-
-            //action
-            var item = new PipelineTransformation(stepType, inputType, outputType);
-
-            //assert
-            item.Step.Should().Be(stepType);
-        }
-
-        [Fact]
-        public void StoreInputType()
-        {
-            // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-
-            //action
-            var item = new PipelineTransformation(stepType, inputType, outputType);
-
-            //assert
-            item.InputType.Should().Be(inputType);
-        }
-
-        [Fact]
-        public void StoreOutputType()
-        {
-            // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-
-            //action
-            var item = new PipelineTransformation(stepType, inputType, outputType);
-
-            //assert
-            item.OutputType.Should().Be(outputType);
-        }
-
-        [Fact]
         public void StoreDefaultInputLink()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -79,10 +31,7 @@
         public void StoreNormalInputLink()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -98,10 +47,7 @@
         public void ReplaceDefaultInputLink()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var defaultLink = Substitute.For<IPipelineLink>();
             defaultLink.IsDefault.Returns(true);
             item.AddInputLink(defaultLink);
@@ -121,10 +67,7 @@
         public void AcceptsTwoInputLinks()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddInputLink(normalLink1);
@@ -145,10 +88,7 @@
         public void StoreDefaultOutputLink()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -164,10 +104,7 @@
         public void StoreNormalOutputLink()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -183,12 +120,9 @@
         public void ReplaceDefaultOutputLink()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
             var target = Substitute.For<IPipelineTarget>();
 
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var defaultLink = Substitute.For<IPipelineLink>();
             defaultLink.IsDefault.Returns(true);
             defaultLink.Source.Returns(item);
@@ -212,10 +146,7 @@
         public void AcceptsTwoOutputLinks()
         {
             // arrange
-            var stepType = typeof(IIntTransformation);
-            var inputType = typeof(int);
-            var outputType = typeof(int);
-            var item = new PipelineTransformation(stepType, inputType, outputType);
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddOutputLink(normalLink1);

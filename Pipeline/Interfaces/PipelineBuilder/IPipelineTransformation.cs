@@ -1,8 +1,7 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineTransformation : IPipelineSource, IPipelineTarget, IPipelineStep
+    public interface IPipelineTransformation<TStep, TInput, TOutput> : IPipelineNamedSource, IPipelineTarget, IPipelineStep<TStep> 
+        where TStep : ICompilerTransformation<TInput,TOutput>
     {
-        string Name { get; }
-        void SetName(string name);
     }
 }

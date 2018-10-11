@@ -12,24 +12,10 @@
     public class PipelineActionShould
     {
         [Fact]
-        public void StoreStepType()
-        {
-            // arrange
-            var stepType = typeof(IIntAction);
-
-            //action
-            var item = new PipelineAction(stepType);
-
-            //assert
-            item.Step.Should().Be(stepType);
-        }
-
-        [Fact]
         public void StoreDefaultLink()
         {
             // arrange
-            var stepType = typeof(IIntAction);
-            var item = new PipelineAction(stepType);
+            var item = new PipelineAction<IIntAction, int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -45,8 +31,7 @@
         public void StoreNormalLink()
         {
             // arrange
-            var stepType = typeof(IIntAction);
-            var item = new PipelineAction(stepType);
+            var item = new PipelineAction<IIntAction, int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -62,8 +47,7 @@
         public void ReplaceDefaultLink()
         {
             // arrange
-            var stepType = typeof(IIntAction);
-            var item = new PipelineAction(stepType);
+            var item = new PipelineAction<IIntAction, int>();
             var defaultLink = Substitute.For<IPipelineLink>();
             defaultLink.IsDefault.Returns(true);
             item.AddInputLink(defaultLink);
@@ -85,8 +69,7 @@
         public void AcceptsTwoInputLinks()
         {
             // arrange
-            var stepType = typeof(IIntAction);
-            var item = new PipelineAction(stepType);
+            var item = new PipelineAction<IIntAction, int>();
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddInputLink(normalLink1);

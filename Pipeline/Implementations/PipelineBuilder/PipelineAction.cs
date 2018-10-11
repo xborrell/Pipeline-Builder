@@ -3,12 +3,11 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks.Dataflow;
 
-    public class PipelineAction : PipelineItem, IPipelineAction
+    public class PipelineAction<TStep, TInput> : PipelineItem, IPipelineAction<TStep, TInput> where TStep : ICompilerAction<TInput>
     {
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
-
-        public Type Step { get; }
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
 
@@ -16,7 +15,7 @@
         {
             if (!inputLinks.Any())
             {
-                inputLinks.Add( pipelineLink );
+                inputLinks.Add(pipelineLink);
                 return;
             }
 
@@ -32,22 +31,55 @@
                 first.Remove();
             }
 
-            inputLinks.Add( pipelineLink );
+            inputLinks.Add(pipelineLink);
         }
 
         public void RemoveInputLink(IPipelineLink pipelineLink)
         {
             inputLinks.Remove(pipelineLink);
         }
-        
-        public PipelineAction(Type step)
-        {
-            Step = step ?? throw new ArgumentNullException(nameof(step));
-        }
 
         public override string ToString()
         {
-            return $"Action<{Step.Name}>";
+            return $"Action<{typeof(TStep).Name}>";
+        }
+
+        public override void ResolveLinkTypes(bool firstItem, Type firstType)
+        {
+            if (firstItem)
+            {
+                if (inputLinks.Count > 0)
+                {
+                    throw new PipelineBuilderException($"The first action cannot be connected to any other block.");
+                }
+
+                if (firstType != typeof(TInput))
+                {
+                    throw new PipelineBuilderException($"The type of first action must match the pipeline type.");
+                }
+            }
+            else
+            {
+                if (inputLinks.Count != 1)
+                {
+                    if (inputLinks.Count == 0)
+                    {
+                        throw new PipelineBuilderException($"Action without input link.");
+                    }
+
+                    throw new PipelineBuilderException($"Action with many input links.");
+                }
+
+                inputLinks[0].SetType(typeof(TInput));
+            }
+        }
+
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        {
+            var step = factory.CreateCompilerStep<TStep>();
+            Block = new ActionBlock<TInput>(input => step.Ejecutar(input), pipeline.BlockOptions);
+
+            pipeline.AddEndStep(Block);
         }
     }
 }

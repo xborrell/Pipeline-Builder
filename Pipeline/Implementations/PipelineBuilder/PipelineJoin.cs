@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+    using System.Threading.Tasks.Dataflow;
 
     public class PipelineJoin : PipelineItem, IPipelineJoin
     {
@@ -53,5 +55,87 @@
             return "Join";
         }
 
+        public override void ResolveLinkTypes(bool firstItem, Type firstType)
+        {
+            if (firstItem)
+            {
+                throw new InvalidOperationException("Join block can't be first item");
+            }
+
+            if (inputLinks.Count < 1)
+            {
+                throw new PipelineBuilderException($"Join without input links.");
+            }
+
+            if (outputLink == null)
+            {
+                throw new PipelineBuilderException($"Join without output link.");
+            }
+
+            var inputTypes = from link in inputLinks select link.Type;
+            var types = inputTypes.ToArray();
+
+            Type precursorType;
+
+            switch (types.Length)
+            {
+                case 2:
+                    precursorType = typeof(Tuple<,>);
+                    break;
+
+                case 3:
+                    precursorType = typeof(Tuple<,,>);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            var outputType = precursorType.MakeGenericType(types);
+
+            outputLink.SetType(outputType);
+        }
+
+
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        {
+            var types = from link in InputLinks select link.Type;
+            var typesArray = types.ToArray();
+
+            string methodName;
+            switch (typesArray.Length)
+            {
+                case 2:
+                    methodName = "BuildJoinBlock2";
+                    break;
+
+                case 3:
+                    methodName = "BuildJoinBlock3";
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+            var method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (method == null)
+            {
+                throw new Exception($"Could not found method '{methodName}'");
+            }
+
+            var methodGeneric = method.MakeGenericMethod(typesArray);
+
+            methodGeneric.Invoke(this, new object[0]);
+        }
+
+        private void BuildJoinBlock2<TIn1, TIn2>()
+        {
+            Block = new JoinBlock<TIn1, TIn2>();
+        }
+
+        private void BuildJoinBlock3<TIn1, TIn2, TIn3>()
+        {
+            Block = new JoinBlock<TIn1, TIn2, TIn3>();
+        }
     }
 }

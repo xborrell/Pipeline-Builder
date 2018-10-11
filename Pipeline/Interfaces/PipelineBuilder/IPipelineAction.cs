@@ -2,7 +2,7 @@
 {
     using System;
 
-    public interface IPipelineAction : IPipelineTarget, IPipelineStep
+    public interface IPipelineAction<TStep, TInput> : IPipelineTarget, IPipelineStep<TStep> where TStep : ICompilerAction<TInput>
     {
     }
 }

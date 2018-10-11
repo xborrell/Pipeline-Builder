@@ -7,7 +7,7 @@
         public bool IsDefault { get; }
         public IPipelineSource Source { get; private set; }
         public IPipelineTarget Target { get; private set;}
-        public Type Type { get; set; }
+        public Type Type { get; private set; }
 
         public PipelineLink( bool isDefault, IPipelineSource source, IPipelineTarget target)
         {
@@ -39,6 +39,25 @@
             Target.RemoveInputLink(this);
             newTarget.AddInputLink(this);
             Target = newTarget;
+        }
+
+        public void SetType(Type newType)
+        {
+            if (newType == null)
+            {
+                throw new ArgumentNullException(nameof(newType));
+            }
+
+            if (Type == null)
+            {
+                Type = newType;
+                return;
+            }
+
+            if (Type != newType)
+            {
+                throw new PipelineBuilderException($"Detected inconsistency. Expected {newType.FullName} but found {Type.FullName}.");
+            }
         }
     }
 }
