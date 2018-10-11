@@ -10,6 +10,8 @@
     {
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
         private IPipelineLink outputLink;
+        private List<IDataflowBlock> sources;
+        
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
         public IEnumerable<IPipelineLink> OutputLinks => new[] { outputLink };
@@ -128,14 +130,43 @@
             methodGeneric.Invoke(this, new object[0]);
         }
 
+        public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
+        {
+            return (ISourceBlock<TOut>)Block;
+        }
+  
+        public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
+        {
+            var pos = inputLinks.IndexOf(link);
+
+            return (ITargetBlock<TIn>)sources[pos];
+        }
+
         private void BuildJoinBlock2<TIn1, TIn2>()
         {
-            Block = new JoinBlock<TIn1, TIn2>();
+            var joinBlock = new JoinBlock<TIn1, TIn2>();
+
+            sources = new List<IDataflowBlock>
+            {
+                joinBlock.Target1,
+                joinBlock.Target2
+            };
+
+
+            Block = joinBlock;
         }
 
         private void BuildJoinBlock3<TIn1, TIn2, TIn3>()
         {
-            Block = new JoinBlock<TIn1, TIn2, TIn3>();
+            var joinBlock = new JoinBlock<TIn1, TIn2, TIn3>();
+            sources = new List<IDataflowBlock>
+            {
+                joinBlock.Target1,
+                joinBlock.Target2,
+                joinBlock.Target3
+            };
+
+            Block = joinBlock;
         }
     }
 }

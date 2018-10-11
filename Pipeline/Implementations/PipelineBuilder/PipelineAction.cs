@@ -81,5 +81,10 @@
 
             pipeline.AddEndStep(Block);
         }
+ 
+        public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
+        {
+            return (ITargetBlock<TIn>)Block;
+        }
     }
 }

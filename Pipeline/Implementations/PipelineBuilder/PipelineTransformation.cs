@@ -129,5 +129,15 @@
             var step = factory.CreateCompilerStep<TStep>();
             Block = new TransformBlock<TInput, TOutput>(input => step.Ejecutar(input), pipeline.BlockOptions);
         }
+
+        public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
+        {
+            return (ISourceBlock<TOut>)Block;
+        }
+ 
+        public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
+        {
+            return (ITargetBlock<TIn>)Block;
+        }
     }
 }

@@ -7,10 +7,20 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Threading.Tasks.Dataflow;
     using Xunit;
 
     public class PipelineJoinShould
     {
+        private readonly IPipelineFactory<int> factory;
+        private readonly IDataflowPipeline<int> pipeline;
+
+        public PipelineJoinShould()
+        {
+            factory = Substitute.For<IPipelineFactory<int>>();
+            pipeline = Substitute.For<IDataflowPipeline<int>>();
+            pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
+        }
         [Fact]
         public void RejectsDefaultInputLink()
         {
@@ -110,6 +120,104 @@
 
             //assert
             acc.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void BuildsBlock()
+        {
+            // arrange
+            var item = new PipelineJoin();
+            var link1 = Substitute.For<IPipelineLink>();
+            link1.IsDefault.Returns(false);
+            item.AddInputLink(link1);
+            link1.Type.Returns(typeof(int));
+
+            var link2 = Substitute.For<IPipelineLink>();
+            link2.IsDefault.Returns(false);
+            item.AddInputLink(link2);
+            link2.Type.Returns(typeof(string));
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            item.Block.Should().NotBeNull();
+            item.Block.Should().BeAssignableTo<JoinBlock<int,string>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsSource()
+        {
+            // arrange
+            var item = new PipelineJoin();
+            var link1 = Substitute.For<IPipelineLink>();
+            link1.IsDefault.Returns(false);
+            item.AddInputLink(link1);
+            link1.Type.Returns(typeof(int));
+
+            var link2 = Substitute.For<IPipelineLink>();
+            link2.IsDefault.Returns(false);
+            item.AddInputLink(link2);
+            link2.Type.Returns(typeof(string));
+
+            item.BuildBlock(pipeline, factory);
+
+            //action
+            var source = item.GetAsSource<Tuple<int, string>>(link1);
+
+            //assert
+            source.Should().NotBeNull();
+            source.Should().BeAssignableTo<ISourceBlock<Tuple<int, string>>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsFirstTarget()
+        {
+            // arrange
+            var item = new PipelineJoin();
+            var link1 = Substitute.For<IPipelineLink>();
+            link1.IsDefault.Returns(false);
+            item.AddInputLink(link1);
+            link1.Type.Returns(typeof(int));
+
+            var link2 = Substitute.For<IPipelineLink>();
+            link2.IsDefault.Returns(false);
+            item.AddInputLink(link2);
+            link2.Type.Returns(typeof(string));
+
+            item.BuildBlock(pipeline, factory);
+
+            //action
+            var target = item.GetAsTarget<int>(link1);
+
+            //assert
+            target.Should().NotBeNull();
+            target.Should().BeAssignableTo<ITargetBlock<int>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsSecondTarget()
+        {
+            // arrange
+            var item = new PipelineJoin();
+            var link1 = Substitute.For<IPipelineLink>();
+            link1.IsDefault.Returns(false);
+            item.AddInputLink(link1);
+            link1.Type.Returns(typeof(int));
+
+            var link2 = Substitute.For<IPipelineLink>();
+            link2.IsDefault.Returns(false);
+            item.AddInputLink(link2);
+            link2.Type.Returns(typeof(string));
+
+            item.BuildBlock(pipeline, factory);
+
+            //action
+            var target = item.GetAsTarget<string>(link2);
+
+            //assert
+            target.Should().NotBeNull();
+            target.Should().BeAssignableTo<ITargetBlock<string>>();
         }
     }
 }

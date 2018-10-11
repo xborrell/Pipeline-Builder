@@ -7,10 +7,21 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Threading.Tasks.Dataflow;
     using Xunit;
 
     public class PipelineForkShould
     {
+        private readonly IPipelineFactory<int> factory;
+        private readonly IDataflowPipeline<int> pipeline;
+
+        public PipelineForkShould()
+        {
+            factory = Substitute.For<IPipelineFactory<int>>();
+            pipeline = Substitute.For<IDataflowPipeline<int>>();
+            pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
+        }
+
         [Fact]
         public void RejectsDefaultInputLink()
         {
@@ -95,6 +106,69 @@
             item.OutputLinks.Count().Should().Be(2);
             item.OutputLinks.First().Should().Be(link1);
             item.OutputLinks.Last().Should().Be(link2);
+        }
+
+        [Fact]
+        public void BuildsBlock()
+        {
+            // arrange
+            var item = new PipelineFork();
+            var link = Substitute.For<IPipelineLink>();
+            link.IsDefault.Returns(false);
+            item.AddInputLink(link);
+            link.Type.Returns(typeof(int));
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            item.Block.Should().NotBeNull();
+            item.Block.Should().BeAssignableTo<BroadcastBlock<int>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsSource()
+        {
+            // arrange
+            var item = new PipelineFork();
+            var inputLink = Substitute.For<IPipelineLink>();
+            inputLink.IsDefault.Returns(false);
+            item.AddInputLink(inputLink);
+            inputLink.Type.Returns(typeof(int));
+
+            var outputLink = Substitute.For<IPipelineLink>();
+            outputLink.IsDefault.Returns(false);
+            item.AddOutputLink(outputLink);
+            outputLink.Type.Returns(typeof(int));
+
+            item.BuildBlock(pipeline, factory);
+
+            //action
+            var source = item.GetAsSource<int>(inputLink);
+
+            //assert
+            source.Should().NotBeNull();
+            source.Should().BeAssignableTo<ISourceBlock<int>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsTarget()
+        {
+            // arrange
+            var item = new PipelineFork();
+            var inputLink = Substitute.For<IPipelineLink>();
+            inputLink.IsDefault.Returns(false);
+            item.AddInputLink(inputLink);
+            inputLink.Type.Returns(typeof(int));
+
+            item.BuildBlock(pipeline, factory);
+
+            //action
+            var target = item.GetAsTarget<int>(inputLink);
+
+            //assert
+            target.Should().NotBeNull();
+            target.Should().BeAssignableTo<ITargetBlock<int>>();
         }
     }
 }

@@ -7,10 +7,21 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Threading.Tasks.Dataflow;
     using Xunit;
 
     public class PipelineActionShould
     {
+        private readonly IPipelineFactory<int> factory;
+        private readonly IDataflowPipeline<int> pipeline;
+
+        public PipelineActionShould()
+        {
+            factory = Substitute.For<IPipelineFactory<int>>();
+            pipeline = Substitute.For<IDataflowPipeline<int>>();
+            pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
+        }
+
         [Fact]
         public void StoreDefaultLink()
         {
@@ -84,6 +95,65 @@
             item.InputLinks.Count().Should().Be(2);
             item.InputLinks.First().Should().Be(normalLink1);
             item.InputLinks.Last().Should().Be(normalLink2);
+        }
+
+        [Fact]
+        public void CallTheFactoryWhenBuildsBlock()
+        {
+            // arrange
+            var item = new PipelineAction<IIntAction, int>();
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            factory.Received(1).CreateCompilerStep<IIntAction>();
+        }
+
+        [Fact]
+        public void BuildsBlock()
+        {
+            // arrange
+            var item = new PipelineAction<IIntAction, int>();
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            item.Block.Should().NotBeNull();
+            item.Block.Should().BeAssignableTo<ActionBlock<int>>();
+        }
+
+        [Fact]
+        public void AddsTheBlockAsEndStep()
+        {
+            // arrange
+            var item = new PipelineAction<IIntAction, int>();
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            pipeline.Received(1).AddEndStep(item.Block);
+
+        }
+
+        [Fact]
+        public void GetsTheBlockAsTarget()
+        {
+            // arrange
+            var item = new PipelineAction<IIntAction, int>();
+            item.BuildBlock(pipeline, factory);
+            var normalLink = Substitute.For<IPipelineLink>();
+            normalLink.IsDefault.Returns(false);
+            item.AddInputLink(normalLink);
+
+            //action
+            var target = item.GetAsTarget<int>(normalLink);
+
+            //assert
+            target.Should().NotBeNull();
+            target.Should().BeAssignableTo<ITargetBlock<int>>();
         }
     }
 }

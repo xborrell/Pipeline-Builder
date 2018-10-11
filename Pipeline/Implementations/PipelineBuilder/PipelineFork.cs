@@ -88,5 +88,15 @@
         {
             Block = new BroadcastBlock<TIn>(input => input, options);
         }
+ 
+        public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
+        {
+            return (ISourceBlock<TOut>)Block;
+        }
+ 
+        public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
+        {
+            return (ITargetBlock<TIn>)Block;
+        }
     }
 }

@@ -7,10 +7,21 @@
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Threading.Tasks.Dataflow;
     using Xunit;
 
     public class PipelineTransformationShould
     {
+        private readonly IPipelineFactory<int> factory;
+        private readonly IDataflowPipeline<int> pipeline;
+
+        public PipelineTransformationShould()
+        {
+            factory = Substitute.For<IPipelineFactory<int>>();
+            pipeline = Substitute.For<IDataflowPipeline<int>>();
+            pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
+        }
+
         [Fact]
         public void StoreDefaultInputLink()
         {
@@ -161,6 +172,69 @@
             item.OutputLinks.Count().Should().Be(2);
             item.OutputLinks.First().Should().Be(normalLink1);
             item.OutputLinks.Last().Should().Be(normalLink2);
+        }
+
+        [Fact]
+        public void CallTheFactoryWhenBuildsBlock()
+        {
+            // arrange
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            factory.Received(1).CreateCompilerStep<IIntTransformation>();
+        }
+
+        [Fact]
+        public void BuildsBlock()
+        {
+            // arrange
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
+
+            //action
+            item.BuildBlock(pipeline, factory);
+
+            //assert
+            item.Block.Should().NotBeNull();
+            item.Block.Should().BeAssignableTo<TransformBlock<int, int>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsSource()
+        {
+            // arrange
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
+            item.BuildBlock(pipeline, factory);
+            var normalLink = Substitute.For<IPipelineLink>();
+            normalLink.IsDefault.Returns(false);
+            item.AddOutputLink(normalLink);
+
+            //action
+            var source = item.GetAsSource<int>(normalLink);
+
+            //assert
+            source.Should().NotBeNull();
+            source.Should().BeAssignableTo<ISourceBlock<int>>();
+        }
+
+        [Fact]
+        public void GetsTheBlockAsTarget()
+        {
+            // arrange
+            var item = new PipelineTransformation<IIntTransformation, int, int>();
+            item.BuildBlock(pipeline, factory);
+            var normalLink = Substitute.For<IPipelineLink>();
+            normalLink.IsDefault.Returns(false);
+            item.AddInputLink(normalLink);
+
+            //action
+            var target = item.GetAsTarget<int>(normalLink);
+
+            //assert
+            target.Should().NotBeNull();
+            target.Should().BeAssignableTo<ITargetBlock<int>>();
         }
     }
 }
