@@ -203,10 +203,7 @@
 
             foreach (var link in links)
             {
-                //var source = link.Source.GetSourceBlock(link);
-                //var target = link.Target.GetTargetBlock(link);
-
-                //source.LinkTo(target, pipeline.LinkOptions);
+                link.Connect(pipeline);
             }
         }
 

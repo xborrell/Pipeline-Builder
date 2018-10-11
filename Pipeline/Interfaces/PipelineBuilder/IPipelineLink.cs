@@ -13,5 +13,6 @@
         void MoveSourceTo(IPipelineSource newSource);
         void MoveTargetTo(IPipelineTarget newTarget);
         void SetType(Type newType);
+        void Connect<T>(IDataflowPipeline<T> pipeline);
     }
 }

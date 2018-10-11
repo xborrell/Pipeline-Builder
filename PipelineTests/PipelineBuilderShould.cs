@@ -296,24 +296,20 @@
         {
             var pipeline = new PipelineBuilder<int>(factory)
                     .AddTransformation<IIntTransformation>("name1")
-                    .AddTransformation<IStringTransformation>("name2")
+                    .AddTransformation<IIntToStringTransformation>("name2")
                     .AddAction<ITupla2Action>()
                     .LinkTo("name1")
                     .LinkTo("name2")
                 ;
 
-            var linkBetweenTransformations = intTransformation.OutputLinks.First();
-            intTransformation.RemoveOutputLink(linkBetweenTransformations);
-
             //Action
             pipeline.Build();
 
             //Assert
-            var joinsEnumeration = from transformation in pipeline.Items.OfType<IPipelineJoin>() select transformation;
-            var join = joinsEnumeration.First();
+            var join = pipeline.Items.OfType<IPipelineJoin>().First();
             
-            join.InputLinks.First().Source.Should().BeSameAs(intTransformation);
-            join.InputLinks.Last().Source.Should().BeSameAs(stringTransformation);
+            join.InputLinks.First().Source.Should().BeSameAs(intToStringTransformation.InputLinks.First().Source);
+            join.InputLinks.Last().Source.Should().BeSameAs(intToStringTransformation);
             join.OutputLinks.First().Target.Should().BeSameAs(tupla2Action);
         }
 
