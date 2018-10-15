@@ -26,7 +26,7 @@
             this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public IPipelineBuilder<TInput> AddAction<TStep>() where TStep : ICompilerTransformation
+        public IPipelineBuilder<TInput> AddAction<TStep>() where TStep : ICompilerStep
         {
             var stepType = typeof(TStep);
 
@@ -55,7 +55,7 @@
             return this;
         }
 
-        public IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerTransformation
+        public IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerStep
         {
             var stepType = typeof(TStep);
 
@@ -87,21 +87,26 @@
 
         private void BuildAction<TStep, TIn>() where TStep : ICompilerAction<TIn>
         {
-            var transformation = factory.CreateAction<TStep, TIn>();
+            var action = factory.CreateAction<TStep, TIn>();
 
-            AddTarget(transformation);
+            AddTarget(action);
         }
 
         private void BuildTransformation<TStep, TIn, TOut>(string name) where TStep : ICompilerTransformation<TIn, TOut>
         {
-            var transformation = factory.CreateTransformation<TStep, TIn, TOut>();
+            var transformations = factory.CreateTransformation<TStep, TIn, TOut>();
+            IPipelineTransformation<TStep, TIn, TOut> lastTransformation = null;
+
+            foreach (var transformation in transformations)
+            {
+                AddTarget(transformation);
+                lastTransformation = transformation;
+            }
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                transformation.SetName(name);
+                lastTransformation.SetName(name);
             }
-
-            AddTarget(transformation);
         }
 
         public IPipelineBuilder<TInput> LinkTo(string name)
@@ -188,8 +193,9 @@
             foreach (var pipelineItem in Items)
             {
                 pipelineItem.BuildBlock(pipeline, factory);
+                pipeline.AddBlock(pipelineItem.Block);
             }
-            
+
             var firstItem = pipelineItems.First();
             pipeline.MarkAsFirstStep((ITargetBlock<TInput>)firstItem.Block);
         }
@@ -229,53 +235,6 @@
             LinkByDefault(pipelineItem);
             lastItem = pipelineItem;
         }
-
-        //private void BuildConnections(IDataflowPipeline<TInput> pipeline)
-        //{
-        //    var method = GetType().GetMethod("LinkBlocks", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        //    if (method == null)
-        //    {
-        //        throw new Exception("Could not found method 'LinkBlocks'");
-        //    }
-
-        //    var inputLinks = Items.OfType<IPipelineTarget>().SelectMany(item => item.InputLinks);
-
-        //    foreach (var link in inputLinks)
-        //    {
-        //        var linkType = link.Type;
-        //        var methodGeneric = method.MakeGenericMethod(linkType);
-
-        //        methodGeneric.Invoke(this, new object[] { pipeline, link });
-        //    }
-        //}
-
-        //private void LinkBlocks<TLink>(IDataflowPipeline<TInput> pipeline, IPipelineLink link)
-        //{
-        //    var source = link.Source.Block as ISourceBlock<TLink>;
-
-        //    var targetBlock = link.Target;
-
-        //    ITargetBlock<TLink> target;
-
-        //    if (targetBlock is IPipelineJoin targetJoin)
-        //    {
-        //        var links = new List<IPipelineLink>();
-        //        links.AddRange(targetJoin.InputLinks);
-
-        //        var pos = links.IndexOf(link);
-
-        //        throw new NotImplementedException();
-        //    }
-        //    else
-        //    {
-        //        target = targetBlock.Block as ITargetBlock<TLink>;
-        //    }
-
-
-        //    source.LinkTo(target, pipeline.LinkOptions);
-        //}
-
 
         public override string ToString()
         {

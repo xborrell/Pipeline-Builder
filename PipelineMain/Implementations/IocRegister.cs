@@ -24,7 +24,25 @@
         private void RegisterSteps(ContainerBuilder builder)
         {
             builder.RegisterType<ValidationStep>().As<IValidationStep>();
+            builder.RegisterType<SortVersionsStep>().As<IAstSortStep>();
+            builder.RegisterType<ResolveVariablesRuleStep>().As<IResolveVariablesRuleStep>();
+            builder.RegisterType<ReadFileStep>().As<IReadFileStep>();
+            builder.RegisterType<NoVersionGreaterThanModuleRuleStep>().As<IAstValidationStep>();
+            builder.RegisterType<MoveVersionsBelowModuleStep>().As<IAstTransformationStep>();
+            builder.RegisterType<MoveNoneBlockContentToSuiteBlockStep>().As<IAstTransformationStep>();
+            builder.RegisterType<MacTreeBuildStep>().As<IMacTreeBuildStep>();
+            builder.RegisterType<InsertTenantSourceStep>().As<IAstTransformationStep>();
+            builder.RegisterType<ForceClearCacheStep>().As<IAstTransformationStep>();
+            builder.RegisterType<EnsureVersionEqualsToModuleStep>().As<IAstTransformationStep>();
+            builder.RegisterType<DuplicatedVersionRuleStep>().As<IAstValidationStep>();
+            builder.RegisterType<DuplicatedVariablesRuleStep>().As<IAstValidationStep>();
             builder.RegisterType<DisplayParametersStep>().As<IDisplayParametersStep>();
+            builder.RegisterType<DisableCommandsRuleStep>().As<IAstTransformationStep>();
+            builder.RegisterType<ConcreteTreeDisplayStep>().As<IConcreteTreeDisplayStep>();
+            builder.RegisterType<ConcreteTreeBuildStep>().As<IConcreteTreeBuildStep>();
+            builder.RegisterType<AddExternalVariablesStep>().As<IAddExternalVariablesStep>();
+            builder.RegisterType<AbstractTreeDisplayStep>().As<IAbstractTreeDisplayStep>();
+            builder.RegisterType<AbstractTreeBuildStep>().As<IAbstractTreeBuildStep>();
         }
     }
 

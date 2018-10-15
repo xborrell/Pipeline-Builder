@@ -15,6 +15,7 @@
 
         public ExecutionDataflowBlockOptions BlockOptions { get; }
         public DataflowLinkOptions LinkOptions { get; private set; }
+        public IEnumerable<IDataflowBlock> Blocks => steps;
 
         public DataflowPipeline()
         {

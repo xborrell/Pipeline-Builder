@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipeline", "Pipeline\Pipeli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipeline.Unit.Tests", "PipelineTests\Pipeline.Unit.Tests.csproj", "{DF96B824-040F-4742-8DBE-5A7EBD58D3DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineMain", "PipelineMain\PipelineMain.csproj", "{475B4296-5816-49A0-A8E6-D8B00248D309}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,12 @@ Global
 		{DF96B824-040F-4742-8DBE-5A7EBD58D3DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF96B824-040F-4742-8DBE-5A7EBD58D3DB}.ReleaseBuild|Any CPU.ActiveCfg = ReleaseBuild|Any CPU
 		{DF96B824-040F-4742-8DBE-5A7EBD58D3DB}.ReleaseBuild|Any CPU.Build.0 = ReleaseBuild|Any CPU
+		{475B4296-5816-49A0-A8E6-D8B00248D309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{475B4296-5816-49A0-A8E6-D8B00248D309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{475B4296-5816-49A0-A8E6-D8B00248D309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{475B4296-5816-49A0-A8E6-D8B00248D309}.Release|Any CPU.Build.0 = Release|Any CPU
+		{475B4296-5816-49A0-A8E6-D8B00248D309}.ReleaseBuild|Any CPU.ActiveCfg = Release|Any CPU
+		{475B4296-5816-49A0-A8E6-D8B00248D309}.ReleaseBuild|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

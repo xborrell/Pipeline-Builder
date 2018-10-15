@@ -127,7 +127,7 @@
         public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
         {
             var step = factory.CreateCompilerStep<TStep>();
-            Block = new TransformBlock<TInput, TOutput>(input => step.Ejecutar(input), pipeline.BlockOptions);
+            Block = new TransformBlock<TInput, TOutput>(input => step.Execute(input), pipeline.BlockOptions);
         }
 
         public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)

@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{475B4296-5816-49A0-A8E6-D8B00248D309}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Pipeline</RootNamespace>
+    <AssemblyName>PipelineMain</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.6.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Dataflow.4.9.0\lib\netstandard2.0\System.Threading.Tasks.Dataflow.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Implementations\Compiler.cs" />
+    <Compile Include="Implementations\CompilerOptions.cs" />
+    <Compile Include="Implementations\IocRegister.cs" />
+    <Compile Include="Implementations\NPUpdaterException.cs" />
+    <Compile Include="Implementations\Process.cs" />
+    <Compile Include="Implementations\Steps\AbstractTreeBuildStep.cs" />
+    <Compile Include="Implementations\Steps\AbstractTreeDisplayStep.cs" />
+    <Compile Include="Implementations\Steps\AddExternalVariablesStep.cs" />
+    <Compile Include="Implementations\Steps\ConcreteTreeBuildStep.cs" />
+    <Compile Include="Implementations\Steps\ConcreteTreeDisplayStep.cs" />
+    <Compile Include="Implementations\Steps\DisableCommandsRuleStep.cs" />
+    <Compile Include="Implementations\Steps\DisplayParametersStep.cs" />
+    <Compile Include="Implementations\Steps\DuplicatedVariablesRuleStep.cs" />
+    <Compile Include="Implementations\Steps\DuplicatedVersionRuleStep.cs" />
+    <Compile Include="Implementations\Steps\EnsureVersionEqualsToModuleStep.cs" />
+    <Compile Include="Implementations\Steps\ForceClearCacheRule.cs" />
+    <Compile Include="Implementations\Steps\InsertTenantSourceStep.cs" />
+    <Compile Include="Implementations\Steps\MacTreeHolderStep.cs" />
+    <Compile Include="Implementations\Steps\MacTreeBuildStep.cs" />
+    <Compile Include="Implementations\Steps\MoveNoneBlockContentToSuiteBlockStep.cs" />
+    <Compile Include="Implementations\Steps\MoveVersionsBelowModuleStep.cs" />
+    <Compile Include="Implementations\Steps\NoVersionGreaterThanModuleRuleStep.cs" />
+    <Compile Include="Implementations\Steps\ReadFileStep.cs" />
+    <Compile Include="Implementations\Steps\ResolveVariablesRuleStep.cs" />
+    <Compile Include="Implementations\Steps\SortVersionsStep.cs" />
+    <Compile Include="Implementations\Steps\ValidationStep.cs" />
+    <Compile Include="Infrastructure\AssemblyNavigator.cs" />
+    <Compile Include="Infrastructure\FindTypes.cs" />
+    <Compile Include="Infrastructure\PipelineBuilderException.cs" />
+    <Compile Include="Infrastructure\TypeCollection.cs" />
+    <Compile Include="Interfaces\IParseTree.cs" />
+    <Compile Include="Interfaces\IScriptRoot.cs" />
+    <Compile Include="Interfaces\IAstRoot.cs" />
+    <Compile Include="Interfaces\ICompiler.cs" />
+    <Compile Include="Interfaces\ICompilerOptions.cs" />
+    <Compile Include="Interfaces\IIoCRegister.cs" />
+    <Compile Include="Interfaces\Steps\IAbstractTreeBuildStep.cs" />
+    <Compile Include="Interfaces\Steps\IAbstractTreeDisplayStep.cs" />
+    <Compile Include="Interfaces\Steps\IAddExternalVariablesStep.cs" />
+    <Compile Include="Interfaces\Steps\IAstSortStep.cs" />
+    <Compile Include="Interfaces\Steps\IAstTransformationStep.cs" />
+    <Compile Include="Interfaces\Steps\IAstValidationStep.cs" />
+    <Compile Include="Interfaces\Steps\IConcreteTreeBuildStep.cs" />
+    <Compile Include="Interfaces\Steps\IConcreteTreeDisplayStep.cs" />
+    <Compile Include="Interfaces\Steps\IDisplayParametersStep.cs" />
+    <Compile Include="Interfaces\Steps\IMacTreeBuildStep.cs" />
+    <Compile Include="Interfaces\Steps\IMacTreeHolderStep.cs" />
+    <Compile Include="Interfaces\Steps\IReadFileStep.cs" />
+    <Compile Include="Interfaces\Steps\IResolveVariablesRuleStep.cs" />
+    <Compile Include="Interfaces\Steps\IValidationStep.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Samples\Sample.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Pipeline\Pipeline.csproj">
+      <Project>{8b776596-2c47-4ffd-84f8-27a15160dcbe}</Project>
+      <Name>Pipeline</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

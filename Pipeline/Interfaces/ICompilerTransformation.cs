@@ -2,18 +2,18 @@ namespace Pipeline
 {
     using System.Threading.Tasks;
 
-    public interface ICompilerTransformation
+    public interface ICompilerStep
     {
 
     }
 
-    public interface ICompilerAction<in TInput> : ICompilerTransformation
+    public interface ICompilerAction<in TInput> : ICompilerStep
     {
-        Task Ejecutar(TInput input);
+        Task Execute(TInput input);
     }
 
-    public interface ICompilerTransformation<in TInput, TOutput> : ICompilerTransformation
+    public interface ICompilerTransformation<in TInput, TOutput> : ICompilerStep
     {
-        Task<TOutput> Ejecutar(TInput input);
+        Task<TOutput> Execute(TInput input);
     }
 }

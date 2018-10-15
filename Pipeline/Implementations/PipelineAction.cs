@@ -77,7 +77,7 @@
         public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
         {
             var step = factory.CreateCompilerStep<TStep>();
-            Block = new ActionBlock<TInput>(input => step.Ejecutar(input), pipeline.BlockOptions);
+            Block = new ActionBlock<TInput>(input => step.Execute(input), pipeline.BlockOptions);
 
             pipeline.AddEndStep(Block);
         }

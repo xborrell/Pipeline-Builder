@@ -1,32 +1,32 @@
 namespace Pipeline
 {
-    using log4net;
     using System;
     using System.IO;
     using System.Threading.Tasks;
+    using log4net;
 
     public class ValidationStep : IValidationStep
     {
-        private readonly ILog tracer;
+        private readonly ILog log;
 
         public ValidationStep(ILog tracer)
         {
-            this.tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
+            this.log = tracer ?? throw new ArgumentNullException(nameof(tracer));
         }
 
-        public Task<ICompilerOptions> Ejecutar(ICompilerOptions options)
+        public Task<ICompilerOptions> Execute(ICompilerOptions options)
         {
             if (!File.Exists(options.InputFile))
             {
-                throw new Exception($"file {options.InputFile} not found.");
+                throw new NPUpdaterException($"file {options.InputFile} not found.");
             }
 
             if (!Directory.Exists(options.OutputFolder))
             {
-                throw new Exception($"folder {options.OutputFolder} not found");
+                throw new NPUpdaterException($"folder {options.OutputFolder} not found");
             }
 
-            tracer.Debug("Compiler parameters validated.");
+            log.Info($"Ejecutando {GetType().Name}");
 
             return Task.FromResult(options);
         }

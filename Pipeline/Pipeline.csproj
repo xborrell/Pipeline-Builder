@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8B776596-2C47-4FFD-84F8-27A15160DCBE}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Pipeline</RootNamespace>
     <AssemblyName>Pipeline</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
@@ -53,55 +56,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Implementations\Compiler.cs" />
-    <Compile Include="Implementations\CompilerOptions.cs" />
-    <Compile Include="Implementations\IocRegister.cs" />
-    <Compile Include="Implementations\PipelineBuilder\DataflowPipeline.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineItem.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineAction.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineBuilder.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineFactory.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineJoin.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineLink.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineFork.cs" />
-    <Compile Include="Implementations\PipelineBuilder\PipelineTransformation.cs" />
-    <Compile Include="Implementations\Process.cs" />
-    <Compile Include="Implementations\Steps\DisplayParametersStep.cs" />
-    <Compile Include="Implementations\Steps\ReadFileStep.cs" />
-    <Compile Include="Implementations\Steps\ValidationStep.cs" />
-    <Compile Include="Infrastructure\AssemblyNavigator.cs" />
-    <Compile Include="Infrastructure\FindTypes.cs" />
-    <Compile Include="Infrastructure\PipelineBuilderException.cs" />
-    <Compile Include="Infrastructure\TypeCollection.cs" />
-    <Compile Include="Interfaces\ICompiler.cs" />
-    <Compile Include="Interfaces\ICompilerOptions.cs" />
+    <Compile Include="Implementations\DataflowPipeline.cs" />
+    <Compile Include="Implementations\PipelineItem.cs" />
+    <Compile Include="Implementations\PipelineAction.cs" />
+    <Compile Include="Implementations\PipelineBuilder.cs" />
+    <Compile Include="Implementations\PipelineFactory.cs" />
+    <Compile Include="Implementations\PipelineJoin.cs" />
+    <Compile Include="Implementations\PipelineLink.cs" />
+    <Compile Include="Implementations\PipelineFork.cs" />
+    <Compile Include="Implementations\PipelineTransformation.cs" />
+    <Compile Include="Implementations\PipelineBuilderException.cs" />
     <Compile Include="Interfaces\ICompilerTransformation.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IDataflowPipeline.cs" />
-    <Compile Include="Interfaces\IIoCRegister.cs" />
+    <Compile Include="Interfaces\IDataflowPipeline.cs" />
     <Compile Include="Interfaces\IPipelineBuilder.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineNamedSource.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineStep.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineAction.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineFactory.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineFork.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineTarget.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineItem.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineLink.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineSource.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineJoin.cs" />
-    <Compile Include="Interfaces\PipelineBuilder\IPipelineTransformation.cs" />
-    <Compile Include="Interfaces\Steps\IDisplayParametersStep.cs" />
-    <Compile Include="Interfaces\Steps\IReadFileStep.cs" />
-    <Compile Include="Interfaces\Steps\IValidationStep.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Interfaces\IPipelineNamedSource.cs" />
+    <Compile Include="Interfaces\IPipelineStep.cs" />
+    <Compile Include="Interfaces\IPipelineAction.cs" />
+    <Compile Include="Interfaces\IPipelineFactory.cs" />
+    <Compile Include="Interfaces\IPipelineFork.cs" />
+    <Compile Include="Interfaces\IPipelineTarget.cs" />
+    <Compile Include="Interfaces\IPipelineItem.cs" />
+    <Compile Include="Interfaces\IPipelineLink.cs" />
+    <Compile Include="Interfaces\IPipelineSource.cs" />
+    <Compile Include="Interfaces\IPipelineJoin.cs" />
+    <Compile Include="Interfaces\IPipelineTransformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Samples\Sample.txt" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

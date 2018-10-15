@@ -1,11 +1,12 @@
 ﻿namespace Pipeline
 {
-    using System.Threading;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
 
     public interface IDataflowPipeline<T>
     {
+        IEnumerable<IDataflowBlock> Blocks { get; }
         ExecutionDataflowBlockOptions BlockOptions { get; }
         DataflowLinkOptions LinkOptions { get; }
 

@@ -1,6 +1,7 @@
 ﻿namespace Pipeline
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Autofac;
 
@@ -60,7 +61,7 @@
             return scope.Resolve<IPipelineAction<TStep, TIn>>();
         }
 
-        public IPipelineTransformation<TStep, TIn, TOut> CreateTransformation<TStep, TIn, TOut>() where TStep : ICompilerTransformation<TIn, TOut>
+        public IEnumerable<IPipelineTransformation<TStep, TIn, TOut>> CreateTransformation<TStep, TIn, TOut>() where TStep : ICompilerTransformation<TIn, TOut>
         {
             var step = typeof(TStep);
             var interfacesImplemented = step.GetInterfaces();
@@ -72,7 +73,7 @@
                 throw new PipelineBuilderException($"{step.Name} is not a transformation.");
             }
 
-            return scope.Resolve<IPipelineTransformation<TStep, TIn, TOut>>();
+            return scope.Resolve<IEnumerable<IPipelineTransformation<TStep, TIn, TOut>>>();
         }
     }
 }

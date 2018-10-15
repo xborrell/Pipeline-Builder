@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using Pipeline;
 
-    public  interface IRejectableTransformation : ICompilerTransformation { }
+    public  interface IRejectableTransformation : ICompilerStep { }
 
     public  interface IIntAction : ICompilerAction<int> { }
 
