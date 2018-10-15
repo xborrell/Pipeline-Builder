@@ -121,8 +121,10 @@
             item.BuildBlock(pipeline, factory);
 
             //assert
-            item.Block.Should().NotBeNull();
-            item.Block.Should().BeAssignableTo<ActionBlock<int>>();
+            var block = item.Blocks.FirstOrDefault();
+
+            block.Should().NotBeNull();
+            block.Should().BeAssignableTo<ActionBlock<int>>();
         }
 
         [Fact]
@@ -135,7 +137,8 @@
             item.BuildBlock(pipeline, factory);
 
             //assert
-            pipeline.Received(1).AddEndStep(item.Block);
+            var block = item.Blocks.FirstOrDefault();
+            pipeline.Received(1).AddEndStep(block);
 
         }
 

@@ -12,7 +12,7 @@
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
         private IPipelineLink outputLink;
         private List<IDataflowBlock> sources;
-        
+
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
         public IEnumerable<IPipelineLink> OutputLinks => new[] { outputLink };
@@ -103,10 +103,10 @@
         public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
             var types = from link in InputLinks select link.Type;
-            var typesArray = types.ToArray();
+            var typesList = types.ToList();
 
             string methodName;
-            switch (typesArray.Length)
+            switch (typesList.Count)
             {
                 case 2:
                     methodName = "BuildJoinBlock2";
@@ -126,16 +126,17 @@
                 throw new Exception($"Could not found method '{methodName}'");
             }
 
-            var methodGeneric = method.MakeGenericMethod(typesArray);
+            typesList.Insert(0, typeof(TPipelineType));
+            var methodGeneric = method.MakeGenericMethod(typesList.ToArray());
 
-            methodGeneric.Invoke(this, new object[0]);
+            methodGeneric.Invoke(this, new[] { pipeline });
         }
 
         public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
         {
-            return (ISourceBlock<TOut>)Block;
+            return (ISourceBlock<TOut>)blocks[0];
         }
-  
+
         public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
         {
             var pos = inputLinks.IndexOf(link);
@@ -143,7 +144,7 @@
             return (ITargetBlock<TIn>)sources[pos];
         }
 
-        private void BuildJoinBlock2<TIn1, TIn2>()
+        private void BuildJoinBlock2<TPipelineType, TIn1, TIn2>(IDataflowPipeline<TPipelineType> pipeline)
         {
             var joinBlock = new JoinBlock<TIn1, TIn2>();
 
@@ -153,11 +154,10 @@
                 joinBlock.Target2
             };
 
-
-            Block = joinBlock;
+            AddBlock(pipeline, joinBlock);
         }
 
-        private void BuildJoinBlock3<TIn1, TIn2, TIn3>()
+        private void BuildJoinBlock3<TPipelineType, TIn1, TIn2, TIn3>(IDataflowPipeline<TPipelineType> pipeline)
         {
             var joinBlock = new JoinBlock<TIn1, TIn2, TIn3>();
             sources = new List<IDataflowBlock>
@@ -167,7 +167,7 @@
                 joinBlock.Target3
             };
 
-            Block = joinBlock;
+            AddBlock(pipeline, joinBlock);
         }
     }
 }

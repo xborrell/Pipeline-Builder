@@ -70,7 +70,7 @@
                 link.SetType(inputLink.Type);
             }
         }
- 
+
         public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
             var method = GetType().GetMethod("BuildForkBlock", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -80,24 +80,24 @@
                 throw new Exception("Could not found method 'BuildForkBlock'");
             }
 
-            var methodGeneric = method.MakeGenericMethod(inputLink.Type);
+            var methodGeneric = method.MakeGenericMethod(inputLink.Type, typeof(TPipelineType));
 
-            methodGeneric.Invoke(this, new object[]{pipeline.BlockOptions});
+            methodGeneric.Invoke(this, new object[] { pipeline });
         }
- 
-        private void BuildForkBlock<TIn>(ExecutionDataflowBlockOptions options)
+
+        private void BuildForkBlock<TIn, TPipelineType>(IDataflowPipeline<TPipelineType> pipeline)
         {
-            Block = new BroadcastBlock<TIn>(input => input, options);
+            AddBlock(pipeline, new BroadcastBlock<TIn>(input => input, pipeline.BlockOptions));
         }
- 
+
         public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
         {
-            return (ISourceBlock<TOut>)Block;
+            return (ISourceBlock<TOut>)blocks[0];
         }
- 
+
         public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
         {
-            return (ITargetBlock<TIn>)Block;
+            return (ITargetBlock<TIn>)blocks[0];
         }
     }
 }

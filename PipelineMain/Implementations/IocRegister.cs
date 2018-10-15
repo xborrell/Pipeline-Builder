@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Reflection;
     using Autofac.Core;
+    using Infrastructure;
+    using TASuite.Commons.Crosscutting;
 
     public class IocRegister : IIoCRegister
     {
@@ -14,7 +16,7 @@
             builder.RegisterType<CompilerOptions>().As<ICompilerOptions>();
             builder.RegisterType<Compiler>().As<ICompiler>();
             builder.RegisterType<PipelineBuilder<ICompilerOptions>>().As<IPipelineBuilder<ICompilerOptions>>();
-
+            builder.RegisterType<IoCAbstractFactory>().As<IIoCAbstractFactory>();
 
             RegisterSteps(builder);
 

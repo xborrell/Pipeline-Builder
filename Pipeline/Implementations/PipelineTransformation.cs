@@ -6,22 +6,22 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public class PipelineTransformation<TStep, TInput, TOutput> : PipelineItem, IPipelineTransformation<TStep, TInput, TOutput> 
-        where TStep : ICompilerTransformation<TInput,TOutput>
+    public abstract class PipelineTransformationBase<TStep, TInput, TOutput> : PipelineItem, IPipelineTransformation<TStep, TInput, TOutput>
+        where TStep : class, ICompilerTransformation<TInput, TOutput>
     {
-        private List<IPipelineLink> inputLinks = new List<IPipelineLink>();
-        private List<IPipelineLink> outputLinks = new List<IPipelineLink>();
+        private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
+        private readonly List<IPipelineLink> outputLinks = new List<IPipelineLink>();
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
         public IEnumerable<IPipelineLink> OutputLinks => outputLinks;
 
         public string Name { get; private set; }
-        
+
         public void AddInputLink(IPipelineLink pipelineLink)
         {
             if (!inputLinks.Any())
             {
-                inputLinks.Add( pipelineLink );
+                inputLinks.Add(pipelineLink);
                 return;
             }
 
@@ -37,13 +37,16 @@
                 inputLinks.Remove(first);
             }
 
-            inputLinks.Add( pipelineLink );
+            inputLinks.Add(pipelineLink);
         }
 
         public void RemoveInputLink(IPipelineLink pipelineLink)
         {
             inputLinks.Remove(pipelineLink);
         }
+
+        public abstract ISourceBlock<TOutput1> GetAsSource<TOutput1>(IPipelineLink link);
+        public abstract ITargetBlock<TInput1> GetAsTarget<TInput1>(IPipelineLink link);
 
         public void AddOutputLink(IPipelineLink pipelineLink)
         {
@@ -52,7 +55,7 @@
 
             if (linkForTarget == null)
             {
-                outputLinks.Add( pipelineLink );
+                outputLinks.Add(pipelineLink);
                 return;
             }
 
@@ -66,7 +69,7 @@
                 outputLinks.Remove(linkForTarget);
             }
 
-            outputLinks.Add( pipelineLink );
+            outputLinks.Add(pipelineLink);
         }
 
         public void RemoveOutputLink(IPipelineLink pipelineLink)
@@ -78,12 +81,12 @@
         {
             Name = name.ToLower();
         }
-        
+
         public override string ToString()
         {
             return $"Transformation<{typeof(TStep).Name}>";
         }
- 
+
         public override void ResolveLinkTypes(bool firstItem, Type firstType)
         {
             if (firstItem)
@@ -124,21 +127,55 @@
 
             outputLinks[0].SetType(typeof(TOutput));
         }
- 
+    }
+
+    public class PipelineTransformation<TStep, TInput, TOutput> : PipelineTransformationBase<TStep, TInput, TOutput>
+        where TStep : class, ICompilerTransformation<TInput, TOutput>
+    {
         public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
             var step = factory.Resolve<TStep>();
-            Block = new TransformBlock<TInput, TOutput>(input => step.Execute(input), pipeline.BlockOptions);
+            AddBlock(pipeline, new TransformBlock<TInput, TOutput>(input => step.Execute(input), pipeline.BlockOptions));
         }
 
-        public ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
+        public override ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
         {
-            return (ISourceBlock<TOut>)Block;
+            return (ISourceBlock<TOut>)blocks[0];
         }
- 
-        public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
+
+        public override ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
         {
-            return (ITargetBlock<TIn>)Block;
+            return (ITargetBlock<TIn>)blocks[0];
+        }
+    }
+
+    public class PipelineTransformation<TStep, TInput> : PipelineTransformationBase<TStep, TInput, TInput>
+        where TStep : class, ICompilerTransformation<TInput, TInput>
+    {
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
+        {
+            var steps = factory.ResolveAll<TStep>();
+
+            TransformBlock<TInput, TInput> previousBlock = null;
+            foreach (var step in steps)
+            {
+                var block = new TransformBlock<TInput, TInput>(input => step.Execute(input), pipeline.BlockOptions);
+                AddBlock(pipeline, block);
+
+                previousBlock?.LinkTo(block, pipeline.LinkOptions);
+
+                previousBlock = block;
+            }
+        }
+
+        public override ISourceBlock<TOut> GetAsSource<TOut>(IPipelineLink link)
+        {
+            return (ISourceBlock<TOut>)blocks.Last();
+        }
+
+        public override ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
+        {
+            return (ITargetBlock<TIn>)blocks.First();
         }
     }
 }

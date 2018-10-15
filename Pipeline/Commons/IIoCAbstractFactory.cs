@@ -5,8 +5,6 @@
 
     public interface IIoCAbstractFactory
     {
-        bool IsRoot { get; }
-
         T Resolve<T>();
         IEnumerable<T> ResolveAll<T>() where T : class;
     }

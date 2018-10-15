@@ -198,8 +198,9 @@
             item.BuildBlock(pipeline, factory);
 
             //assert
-            item.Block.Should().NotBeNull();
-            item.Block.Should().BeAssignableTo<TransformBlock<int, int>>();
+            var block = item.Blocks.FirstOrDefault();
+            block.Should().NotBeNull();
+            block.Should().BeAssignableTo<TransformBlock<int, int>>();
         }
 
         [Fact]

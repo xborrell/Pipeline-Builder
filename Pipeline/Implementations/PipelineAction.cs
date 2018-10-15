@@ -78,14 +78,15 @@
         public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
             var step = factory.Resolve<TStep>();
-            Block = new ActionBlock<TInput>(input => step.Execute(input), pipeline.BlockOptions);
+            var block = new ActionBlock<TInput>(input => step.Execute(input), pipeline.BlockOptions);
 
-            pipeline.AddEndStep(Block);
+            AddBlock(pipeline, block);
+            pipeline.AddEndStep(block);
         }
  
         public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
         {
-            return (ITargetBlock<TIn>)Block;
+            return (ITargetBlock<TIn>)blocks[0];
         }
     }
 }

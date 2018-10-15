@@ -35,13 +35,13 @@
             };
         }
 
-        public void MarkAsFirstStep(ITargetBlock<T> block)
-        {
-            firstStep = block;
-        }
-
         public void AddBlock(IDataflowBlock block)
         {
+            if (steps.Count == 0)
+            {
+                firstStep = (ITargetBlock<T>)block;
+            }
+
             steps.Add(block);
         }
 

@@ -77,14 +77,25 @@
             var inputType = implementedTransformation.GetGenericArguments()[0];
             var outputType = implementedTransformation.GetGenericArguments()[1];
 
-            var method = GetType().GetMethod("BuildTransformation", BindingFlags.NonPublic | BindingFlags.Instance);
+            string methodName = "BuildTransformation1";
+            var typeParameters = new List<Type>() { stepType, inputType };
+
+            if (inputType != outputType)
+            {
+                typeParameters.Add(outputType);
+                methodName = "BuildTransformation2";
+            }
+
+
+            var method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (method == null)
             {
-                throw new Exception("Could not found method 'BuildTransformation'");
+                throw new Exception($"Could not found method '{methodName}'");
             }
 
-            var methodGeneric = method.MakeGenericMethod(stepType, inputType, outputType);
+
+            var methodGeneric = method.MakeGenericMethod(typeParameters.ToArray());
 
             methodGeneric.Invoke(this, new object[] { name });
 
@@ -93,26 +104,32 @@
 
         private void BuildAction<TStep, TIn>() where TStep : ICompilerAction<TIn>
         {
-            var action = factory.Resolve<IPipelineAction<TStep, TIn>>();
+            var action = new PipelineAction<TStep, TIn>();
 
             AddTarget(action);
         }
 
-        private void BuildTransformation<TStep, TIn, TOut>(string name) where TStep : ICompilerTransformation<TIn, TOut>
+        private void BuildTransformation1<TStep, TIn>(string name) where TStep : class, ICompilerTransformation<TIn, TIn>
         {
-            var transformations = factory.ResolveAll<IPipelineTransformation<TStep, TIn, TOut>>();
+            var transformation = new PipelineTransformation<TStep, TIn>();
 
-            IPipelineTransformation<TStep, TIn, TOut> lastTransformation = null;
-
-            foreach (var transformation in transformations)
-            {
-                AddTarget(transformation);
-                lastTransformation = transformation;
-            }
+            AddTarget(transformation);
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                lastTransformation.SetName(name);
+                transformation.SetName(name);
+            }
+        }
+
+        private void BuildTransformation2<TStep, TIn, TOut>(string name) where TStep : class, ICompilerTransformation<TIn, TOut>
+        {
+            var transformation = new PipelineTransformation<TStep, TIn, TOut>();
+
+            AddTarget(transformation);
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                transformation.SetName(name);
             }
         }
 
@@ -200,11 +217,7 @@
             foreach (var pipelineItem in Items)
             {
                 pipelineItem.BuildBlock(pipeline, factory);
-                pipeline.AddBlock(pipelineItem.Block);
             }
-
-            var firstItem = pipelineItems.First();
-            pipeline.MarkAsFirstStep((ITargetBlock<TInput>)firstItem.Block);
         }
 
         private void BuildConnections(IDataflowPipeline<TInput> pipeline)

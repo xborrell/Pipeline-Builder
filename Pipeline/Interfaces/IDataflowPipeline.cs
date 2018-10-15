@@ -10,7 +10,6 @@
         ExecutionDataflowBlockOptions BlockOptions { get; }
         DataflowLinkOptions LinkOptions { get; }
 
-        void MarkAsFirstStep(ITargetBlock<T> block);
         void AddBlock(IDataflowBlock block);
         void AddEndStep(IDataflowBlock block);
 

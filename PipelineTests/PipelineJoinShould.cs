@@ -142,8 +142,9 @@
             item.BuildBlock(pipeline, factory);
 
             //assert
-            item.Block.Should().NotBeNull();
-            item.Block.Should().BeAssignableTo<JoinBlock<int,string>>();
+            var block = item.Blocks.FirstOrDefault();
+            block.Should().NotBeNull();
+            block.Should().BeAssignableTo<JoinBlock<int,string>>();
         }
 
         [Fact]

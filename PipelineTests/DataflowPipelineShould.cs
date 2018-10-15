@@ -22,7 +22,6 @@
             var block = new ActionBlock<int>(receivedValue => value = receivedValue, pipeline.BlockOptions);
 
             //Action
-            pipeline.MarkAsFirstStep(block);
             pipeline.AddBlock(block);
             pipeline.AddEndStep(block);
 
@@ -45,7 +44,6 @@
             var block2 = new ActionBlock<int>(receivedValue => value = receivedValue, pipeline.BlockOptions);
 
             //Action
-            pipeline.MarkAsFirstStep(block1);
             pipeline.AddBlock(block1);
             pipeline.AddBlock(block2);
             pipeline.AddEndStep(block2);
@@ -74,7 +72,6 @@
             var block3 = new ActionBlock<int>(receivedValue => value2 = receivedValue * 3, pipeline.BlockOptions);
 
             //Action
-            pipeline.MarkAsFirstStep(block1);
             pipeline.AddBlock(block1);
             pipeline.AddBlock(block2);
             pipeline.AddBlock(block3);
@@ -111,7 +108,6 @@
             var block3 = new ActionBlock<Tuple<int, string>>(receivedValue => result = $"{receivedValue.Item2} => {receivedValue.Item1}", pipeline.BlockOptions);
 
             //Action
-            pipeline.MarkAsFirstStep(block1);
             pipeline.AddBlock(block1);
             pipeline.AddBlock(fork);
             pipeline.AddBlock(block1a);

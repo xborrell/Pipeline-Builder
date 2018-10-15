@@ -16,37 +16,13 @@
     public class PipelineBuilderShould
     {
         private readonly IIoCAbstractFactory factory;
-        private readonly PipelineAction<IIntAction, int> intAction;
-        private readonly PipelineAction<IStringAction, string> stringAction1;
-        private readonly PipelineAction<IStringAction, string> stringAction2;
-        private readonly PipelineAction<ITupla2Action, Tuple<int, string>> tupla2Action;
-        private readonly PipelineTransformation<IIntTransformation, int, int> intTransformation;
-        private readonly PipelineTransformation<IIntToStringTransformation, int, string> intToStringTransformation;
-        private readonly PipelineTransformation<IStringTransformation, string, string> stringTransformation1;
-        private readonly PipelineTransformation<IStringTransformation, string, string> stringTransformation2;
 
         public PipelineBuilderShould()
         {
-            intAction = new PipelineAction<IIntAction, int>();
-            stringAction1 = new PipelineAction<IStringAction, string>();
-            stringAction2 = new PipelineAction<IStringAction, string>();
-            tupla2Action = new PipelineAction<ITupla2Action, Tuple<int, string>>();
-            intTransformation = new PipelineTransformation<IIntTransformation, int, int>();
-            intToStringTransformation = new PipelineTransformation<IIntToStringTransformation, int, string>();
-            stringTransformation1 = new PipelineTransformation<IStringTransformation, string, string>();
-            stringTransformation2 = new PipelineTransformation<IStringTransformation, string, string>();
-
             factory = Substitute.For<IIoCAbstractFactory>();
-            factory.Resolve<IPipelineAction<IIntAction, int>>().Returns(intAction);
-            factory.Resolve<IPipelineAction<IStringAction, string>>().Returns(stringAction1, stringAction2);
-            factory.Resolve<IPipelineAction<ITupla2Action, Tuple<int, string>>>().Returns(tupla2Action);
 
-            factory.ResolveAll<IPipelineTransformation<IIntTransformation, int, int>>()
-                .Returns(new IPipelineTransformation<IIntTransformation, int, int>[] { intTransformation });
-            factory.ResolveAll<IPipelineTransformation<IIntToStringTransformation, int, string>>()
-                .Returns(new IPipelineTransformation<IIntToStringTransformation, int, string>[] { intToStringTransformation });
-            factory.ResolveAll<IPipelineTransformation<IStringTransformation, string, string>>()
-                .Returns(new IPipelineTransformation<IStringTransformation, string, string>[] { stringTransformation1, stringTransformation2 });
+            factory.ResolveAll<IIntTransformation>().Returns(new List<IIntTransformation>{Substitute.For<IIntTransformation>()});
+            factory.ResolveAll<IStringTransformation>().Returns(new List<IStringTransformation>{Substitute.For<IStringTransformation>()});
         }
 
         [Fact]
@@ -200,8 +176,11 @@
             var builder = PipelineBuilder<int>.Create(factory)
                     .AddTransformation<IIntTransformation>()
                     .AddAction<IIntAction>()
-                    .Build()
                 ;
+
+            builder.Build();
+
+            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
 
             intAction.InputLinks.Count().Should().Be(1);
             var link = intAction.InputLinks.First();
@@ -211,7 +190,7 @@
         [Fact]
         public void CountTheLinksBeforeBuild()
         {
-            PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int>.Create(factory)
                     .AddTransformation<IIntTransformation>("name")
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
@@ -219,21 +198,25 @@
                     .LinkTo("name")
                 ;
 
+            var intTransformation = builder.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
             intTransformation.InputLinks.Count().Should().Be(0);
             intTransformation.OutputLinks.Count().Should().Be(2);
 
+            var intToStringTransformation = builder.Items.OfType<IPipelineTransformation<IIntToStringTransformation, int, string>>().First();
             intToStringTransformation.InputLinks.Count().Should().Be(1);
             intToStringTransformation.OutputLinks.Count().Should().Be(1);
 
-            stringAction1.InputLinks.Count().Should().Be(1);
+            var stringAction = builder.Items.OfType<IPipelineAction<IStringAction, string>>().First();
+            stringAction.InputLinks.Count().Should().Be(1);
 
+            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
             intAction.InputLinks.Count().Should().Be(1);
         }
 
         [Fact]
         public void ExplicitLinkSteps()
         {
-            PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int>.Create(factory)
                 .AddTransformation<IIntTransformation>("name")
                 .AddTransformation<IIntToStringTransformation>()
                 .AddAction<IStringAction>()
@@ -242,9 +225,13 @@
                 ;
 
             //Assert
+            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
+
             intAction.InputLinks.Count().Should().Be(1);
             var link = intAction.InputLinks.First();
             link.IsDefault.Should().BeFalse();
+
+            var intTransformation = builder.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
             link.Source.Should().Be(intTransformation);
         }
 
@@ -421,13 +408,15 @@
             var builder = PipelineBuilder<int>.Create(factory)
                     .AddAction<IIntAction>()
                 ;
+            var pipeline = builder.Build();
 
-            //Action
-            builder.Build();
+            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
+            intAction.Should().NotBeNull();
 
-            //Assert
-            intAction.Block.Should().NotBeNull();
-            intAction.Block.Should().BeOfType<ActionBlock<int>>();
+            var intBlock = pipeline.Blocks.OfType<ActionBlock<int>>().First();
+            intBlock.Should().NotBeNull();
+
+            intAction.Blocks.First().Should().BeSameAs(intBlock);
         }
 
         [Fact]
@@ -438,12 +427,16 @@
                     .AddAction<IIntAction>()
                 ;
 
-            //Action
-            builder.Build();
+            var pipeline = builder.Build();
 
-            //Assert
-            intTransformation.Block.Should().NotBeNull();
-            intTransformation.Block.Should().BeOfType<TransformBlock<int, int>>();
+            var intTransformation = builder.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
+            intTransformation.Should().NotBeNull();
+
+            var intBlock = pipeline.Blocks.OfType<TransformBlock<int, int>>().First();
+            intBlock.Should().NotBeNull();
+
+            intTransformation.Blocks.First().Should().BeSameAs(intBlock);
+
         }
 
         [Fact]
@@ -473,9 +466,26 @@
                     .Build()
                 ;
 
-            var join = pipeline.Blocks.OfType<JoinBlock<int,string>>().FirstOrDefault();
+            var join = pipeline.Blocks.OfType<JoinBlock<int, string>>().FirstOrDefault();
             join.Should().NotBeNull();
             join.Should().BeOfType<JoinBlock<int, string>>();
+        }
+
+        [Fact]
+        public void BuildManyTransformationBlocks()
+        {
+            factory.ResolveAll<IIntTransformation>().Returns(new List<IIntTransformation>{Substitute.For<IIntTransformation>(), Substitute.For<IIntTransformation>()});
+
+            var builder = PipelineBuilder<int>.Create(factory)
+                    .AddTransformation<IIntTransformation>()
+                    .AddAction<IIntAction>()
+                ;
+
+            var pipeline = builder.Build();
+
+            var intBlocks = pipeline.Blocks.OfType<TransformBlock<int, int>>();
+            intBlocks.Should().NotBeNull();
+            intBlocks.Count().Should().Be(2);
         }
     }
 }

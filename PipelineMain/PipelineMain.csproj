@@ -81,6 +81,7 @@
     <Compile Include="Implementations\Steps\ValidationStep.cs" />
     <Compile Include="Infrastructure\AssemblyNavigator.cs" />
     <Compile Include="Infrastructure\FindTypes.cs" />
+    <Compile Include="Infrastructure\IoCAbstractFactory.cs" />
     <Compile Include="Infrastructure\PipelineBuilderException.cs" />
     <Compile Include="Infrastructure\TypeCollection.cs" />
     <Compile Include="Interfaces\IParseTree.cs" />
