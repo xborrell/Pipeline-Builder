@@ -8,16 +8,17 @@
     using System.Linq;
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
     using Xunit;
 
     public class PipelineForkShould
     {
-        private readonly IPipelineFactory<int> factory;
+        private readonly IIoCAbstractFactory factory;
         private readonly IDataflowPipeline<int> pipeline;
 
         public PipelineForkShould()
         {
-            factory = Substitute.For<IPipelineFactory<int>>();
+            factory = Substitute.For<IIoCAbstractFactory>();
             pipeline = Substitute.For<IDataflowPipeline<int>>();
             pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
         }

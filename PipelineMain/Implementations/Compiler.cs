@@ -6,13 +6,16 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
+    using Autofac;
+    using TASuite.Commons.Crosscutting;
 
     public class Compiler : ICompiler
     {
-        private readonly IPipelineBuilder<ICompilerOptions> pipelineBuilder;
+        private readonly IIoCAbstractFactory factory;
 
-        public Compiler(IPipelineBuilder<ICompilerOptions> pipelineBuilder) {
-            this.pipelineBuilder = pipelineBuilder ?? throw new ArgumentNullException(nameof(pipelineBuilder));
+        public Compiler(IIoCAbstractFactory factory)
+        {
+            this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         public Task Compilar(ICompilerOptions options)
@@ -30,7 +33,7 @@
 
         private IDataflowPipeline<ICompilerOptions> BuildPipeline()
         {
-            return pipelineBuilder
+            return PipelineBuilder<ICompilerOptions>.Create(factory)
                 .AddTransformation<IValidationStep>("parametersSource")
                 .AddAction<IDisplayParametersStep>()
                 .AddTransformation<IReadFileStep>()

@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
 
     public class PipelineAction<TStep, TInput> : PipelineItem, IPipelineAction<TStep, TInput> where TStep : ICompilerAction<TInput>
     {
@@ -74,9 +75,9 @@
             }
         }
 
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
-            var step = factory.CreateCompilerStep<TStep>();
+            var step = factory.Resolve<TStep>();
             Block = new ActionBlock<TInput>(input => step.Execute(input), pipeline.BlockOptions);
 
             pipeline.AddEndStep(Block);

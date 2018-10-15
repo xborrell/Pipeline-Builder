@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
 
     public class PipelineJoin : PipelineItem, IPipelineJoin
     {
@@ -99,7 +100,7 @@
         }
 
 
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
             var types = from link in InputLinks select link.Type;
             var typesArray = types.ToArray();

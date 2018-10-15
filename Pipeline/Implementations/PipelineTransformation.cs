@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
 
     public class PipelineTransformation<TStep, TInput, TOutput> : PipelineItem, IPipelineTransformation<TStep, TInput, TOutput> 
         where TStep : ICompilerTransformation<TInput,TOutput>
@@ -124,9 +125,9 @@
             outputLinks[0].SetType(typeof(TOutput));
         }
  
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
-            var step = factory.CreateCompilerStep<TStep>();
+            var step = factory.Resolve<TStep>();
             Block = new TransformBlock<TInput, TOutput>(input => step.Execute(input), pipeline.BlockOptions);
         }
 

@@ -8,16 +8,17 @@
     using System.Linq;
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
     using Xunit;
 
     public class PipelineTransformationShould
     {
-        private readonly IPipelineFactory<int> factory;
+        private readonly IIoCAbstractFactory factory;
         private readonly IDataflowPipeline<int> pipeline;
 
         public PipelineTransformationShould()
         {
-            factory = Substitute.For<IPipelineFactory<int>>();
+            factory = Substitute.For<IIoCAbstractFactory>();
             pipeline = Substitute.For<IDataflowPipeline<int>>();
             pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
         }
@@ -184,7 +185,7 @@
             item.BuildBlock(pipeline, factory);
 
             //assert
-            factory.Received(1).CreateCompilerStep<IIntTransformation>();
+            factory.Received(1).Resolve<IIntTransformation>();
         }
 
         [Fact]

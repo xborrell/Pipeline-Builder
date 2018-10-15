@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Reflection;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
 
     public class PipelineFork : PipelineItem, IPipelineFork
     {
@@ -70,7 +71,7 @@
             }
         }
  
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IPipelineFactory<TPipelineType> factory)
+        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
         {
             var method = GetType().GetMethod("BuildForkBlock", BindingFlags.NonPublic | BindingFlags.Instance);
 

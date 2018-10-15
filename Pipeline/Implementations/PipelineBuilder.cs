@@ -8,19 +8,25 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks.Dataflow;
+    using TASuite.Commons.Crosscutting;
 
     public class PipelineBuilder<TInput> : IPipelineBuilder<TInput>
     {
         private static readonly Type CompilerActionGenericType = typeof(ICompilerAction<>);
         private static readonly Type CompilerTransformationGenericType = typeof(ICompilerTransformation<,>);
 
-        private readonly IPipelineFactory<TInput> factory;
+        private readonly IIoCAbstractFactory factory;
         private readonly List<IPipelineItem> pipelineItems;
         private IPipelineTarget lastItem;
 
         public IEnumerable<IPipelineItem> Items => pipelineItems;
 
-        public PipelineBuilder(IPipelineFactory<TInput> factory)
+        public static PipelineBuilder<TInput> Create(IIoCAbstractFactory factory)
+        {
+            return new PipelineBuilder<TInput>(factory);
+        }
+
+        protected PipelineBuilder(IIoCAbstractFactory factory)
         {
             pipelineItems = new List<IPipelineItem>();
             this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -87,14 +93,15 @@
 
         private void BuildAction<TStep, TIn>() where TStep : ICompilerAction<TIn>
         {
-            var action = factory.CreateAction<TStep, TIn>();
+            var action = factory.Resolve<IPipelineAction<TStep, TIn>>();
 
             AddTarget(action);
         }
 
         private void BuildTransformation<TStep, TIn, TOut>(string name) where TStep : ICompilerTransformation<TIn, TOut>
         {
-            var transformations = factory.CreateTransformation<TStep, TIn, TOut>();
+            var transformations = factory.ResolveAll<IPipelineTransformation<TStep, TIn, TOut>>();
+
             IPipelineTransformation<TStep, TIn, TOut> lastTransformation = null;
 
             foreach (var transformation in transformations)
@@ -115,7 +122,7 @@
 
             var transformation = pipelineItems.OfType<IPipelineNamedSource>().First(t => t.Name == name);
 
-            factory.CreateLink(false, transformation, lastItem);
+            new PipelineLink(false, transformation, lastItem);
 
             return this;
         }
@@ -126,7 +133,7 @@
             ResolveJoins();
             CheckTypes();
 
-            var pipeline = factory.CreatePipeline();
+            var pipeline = new DataflowPipeline<TInput>();
 
             BuildBlocks(pipeline);
             BuildConnections(pipeline);
@@ -143,14 +150,14 @@
 
             foreach (var target in joinCandidates.ToList())
             {
-                var join = factory.CreateJoin();
+                var join = new PipelineJoin();
 
                 foreach (var link in target.InputLinks.ToList())
                 {
                     link.MoveTargetTo(join);
                 }
 
-                factory.CreateLink(false, join, target);
+                new PipelineLink(false, join, target);
 
                 pipelineItems.Add(join);
             }
@@ -165,14 +172,14 @@
 
             foreach (var source in forkCandidates.ToList())
             {
-                var fork = factory.CreateFork();
+                var fork = new PipelineFork();
 
                 foreach (var link in source.OutputLinks.ToList())
                 {
                     link.MoveSourceTo(fork);
                 }
 
-                factory.CreateLink(false, source, fork);
+                new PipelineLink(false, source, fork);
 
                 pipelineItems.Add(fork);
             }
@@ -223,7 +230,7 @@
 
                 if (pipelineItems[pos] is IPipelineSource transformation)
                 {
-                    factory.CreateLink(true, transformation, item);
+                    new PipelineLink(true, transformation, item);
                     break;
                 }
             }

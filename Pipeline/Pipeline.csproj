@@ -56,11 +56,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commons\IIoCAbstractFactory.cs" />
     <Compile Include="Implementations\DataflowPipeline.cs" />
     <Compile Include="Implementations\PipelineItem.cs" />
     <Compile Include="Implementations\PipelineAction.cs" />
     <Compile Include="Implementations\PipelineBuilder.cs" />
-    <Compile Include="Implementations\PipelineFactory.cs" />
     <Compile Include="Implementations\PipelineJoin.cs" />
     <Compile Include="Implementations\PipelineLink.cs" />
     <Compile Include="Implementations\PipelineFork.cs" />
@@ -72,7 +72,6 @@
     <Compile Include="Interfaces\IPipelineNamedSource.cs" />
     <Compile Include="Interfaces\IPipelineStep.cs" />
     <Compile Include="Interfaces\IPipelineAction.cs" />
-    <Compile Include="Interfaces\IPipelineFactory.cs" />
     <Compile Include="Interfaces\IPipelineFork.cs" />
     <Compile Include="Interfaces\IPipelineTarget.cs" />
     <Compile Include="Interfaces\IPipelineItem.cs" />
