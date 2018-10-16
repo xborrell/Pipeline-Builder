@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
 
-    public class DataflowPipeline<TIn, TOut> : IDataflowPipeline<TIn, TOut>
+    public class DataflowPipeline<TIn> : IDataflowPipeline<TIn>
     {
         private ITargetBlock<TIn> firstStep;
         private readonly List<IDataflowBlock> steps;
@@ -60,17 +60,6 @@
         public void Complete()
         {
             firstStep.Complete();
-        }
-
-        public void SetOutput(Action<TOut> outputHolder)
-        {
-            var lastBlock = (ISourceBlock<TOut>)steps.Last();
-
-            var block = new ActionBlock<TOut>(outputHolder, BlockOptions);
-            AddBlock(block);
-            AddEndStep(block);
-
-            lastBlock.LinkTo(block, LinkOptions);
         }
 
         public Task Completion => Task.WhenAll(lastSteps.Select(x => x.Completion));

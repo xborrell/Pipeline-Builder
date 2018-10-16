@@ -19,9 +19,8 @@
         Task Completion { get; }
     }
 
-    public interface IDataflowPipeline<in TIn, out TOut> : IDataflowPipeline
+    public interface IDataflowPipeline<in TIn> : IDataflowPipeline
     {
         void Post(TIn input);
-        void SetOutput(Action<TOut> outputHolder);
     }
 }

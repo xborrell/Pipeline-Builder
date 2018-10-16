@@ -153,13 +153,13 @@
             return this;
         }
 
-        public IDataflowPipeline<TInput, TOutput> Build()
+        public IDataflowPipeline<TInput> Build()
         {
             ResolveForks();
             ResolveJoins();
             CheckTypes();
 
-            var pipeline = new DataflowPipeline<TInput, TOutput>();
+            var pipeline = new DataflowPipeline<TInput>();
 
             BuildBlocks(pipeline);
             BuildConnections(pipeline);
@@ -221,7 +221,7 @@
             }
         }
 
-        private void BuildBlocks(IDataflowPipeline<TInput, TOutput> pipeline)
+        private void BuildBlocks(IDataflowPipeline<TInput> pipeline)
         {
             foreach (var pipelineItem in Items)
             {
@@ -229,7 +229,7 @@
             }
         }
 
-        private void BuildConnections(IDataflowPipeline<TInput, TOutput> pipeline)
+        private void BuildConnections(IDataflowPipeline<TInput> pipeline)
         {
             var links = Items.OfType<IPipelineSource>().SelectMany(source => source.OutputLinks)
                 .Union(

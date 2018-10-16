@@ -6,7 +6,7 @@
     public interface IPipelineBuilder<in TInput, out TOutput>
     {
         IEnumerable<IPipelineItem> Items { get; }
-        IDataflowPipeline<TInput, TOutput> Build();
+        IDataflowPipeline<TInput> Build();
         IPipelineBuilder<TInput, TOutput> AddTransformation<TStep>(string name = "") where TStep : ICompilerStep;
         IPipelineBuilder<TInput, TOutput> AddAction<TStep>() where TStep : ICompilerStep;
         IPipelineBuilder<TInput, TOutput> LinkTo(string name);

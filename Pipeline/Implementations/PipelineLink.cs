@@ -61,7 +61,7 @@
             }
         }
 
-        public void Connect<TPipelineIn, TPipelineOut>(IDataflowPipeline<TPipelineIn, TPipelineOut> pipeline)
+        public void Connect(IDataflowPipeline pipeline)
         {
             var method = GetType().GetMethod("ConnectBlocks", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -70,12 +70,12 @@
                 throw new Exception("Could not found method 'ConnectBlocks'");
             }
 
-            var methodGeneric = method.MakeGenericMethod(Type, typeof(TPipelineIn), typeof(TPipelineOut));
+            var methodGeneric = method.MakeGenericMethod(Type);
 
             methodGeneric.Invoke(this, new object[]{pipeline});
         }
 
-        private void ConnectBlocks<TLink, TPipelineIn, TPipelineOut>(IDataflowPipeline<TPipelineIn, TPipelineOut> pipeline)
+        private void ConnectBlocks<TLink>(IDataflowPipeline pipeline)
         {
             var source = Source.GetAsSource<TLink>(this);
             var target = Target.GetAsTarget<TLink>(this);

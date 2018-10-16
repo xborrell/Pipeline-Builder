@@ -18,7 +18,7 @@
         {
             //Arrange
             var value = 0;
-            var pipeline = new DataflowPipeline<int, string>();
+            var pipeline = new DataflowPipeline<int>();
             var block = new ActionBlock<int>(receivedValue => value = receivedValue, pipeline.BlockOptions);
 
             //Action
@@ -39,7 +39,7 @@
         {
             //Arrange
             var value = 0;
-            var pipeline = new DataflowPipeline<int, string>();
+            var pipeline = new DataflowPipeline<int>();
             var block1 = new TransformBlock<int, int>(receivedValue => receivedValue + 1, pipeline.BlockOptions);
             var block2 = new ActionBlock<int>(receivedValue => value = receivedValue, pipeline.BlockOptions);
 
@@ -65,7 +65,7 @@
             //Arrange
             var value1 = 0;
             var value2 = 0;
-            var pipeline = new DataflowPipeline<int, string>();
+            var pipeline = new DataflowPipeline<int>();
             var block1 = new TransformBlock<int, int>(receivedValue => receivedValue + 1, pipeline.BlockOptions);
             var fork = new BroadcastBlock<int>(receivedValue => receivedValue);
             var block2 = new ActionBlock<int>(receivedValue => value1 = receivedValue * 2, pipeline.BlockOptions);
@@ -99,7 +99,7 @@
         {
             //Arrange
             var result = "";
-            var pipeline = new DataflowPipeline<int, string>();
+            var pipeline = new DataflowPipeline<int>();
             var block1 = new TransformBlock<int, int>(receivedValue => receivedValue + 1, pipeline.BlockOptions);
             var fork = new BroadcastBlock<int>(receivedValue => receivedValue);
             var block1a = new TransformBlock<int, string>(receivedValue => receivedValue.ToString(), pipeline.BlockOptions);
@@ -131,51 +131,6 @@
             await pipeline.Completion.ConfigureAwait(false);
 
             result.Should().Be("2 => 4");
-        }
-
-        [Fact]
-        public async Task GetReturnSingleData()
-        {
-            //Arrange
-            var value = 0;
-            var pipeline = new DataflowPipeline<int, int>();
-            var block1 = new TransformBlock<int, int>(receivedValue => receivedValue + 1, pipeline.BlockOptions);
-
-            pipeline.AddBlock(block1);
-            pipeline.SetOutput(x => value = x );
-
-            //action
-            pipeline.Post(1);
-            pipeline.Complete();
-
-            await pipeline.Completion.ConfigureAwait(false);
-
-            //Assert
-            value.Should().Be(2);
-        }
-
-        [Fact]
-        public async Task GetReturnMultipleData()
-        {
-            //Arrange
-            var values = new List<int>();
-            var pipeline = new DataflowPipeline<int, int>();
-            var block1 = new TransformBlock<int, int>(receivedValue => receivedValue + 1, pipeline.BlockOptions);
-
-            pipeline.AddBlock(block1);
-            pipeline.SetOutput(x => values.Add(x) );
-
-            //action
-            pipeline.Post(1);
-            pipeline.Post(2);
-            pipeline.Complete();
-
-            await pipeline.Completion.ConfigureAwait(false);
-
-            //Assert
-            values.Count.Should().Be(2);
-            values[0].Should().Be(2);
-            values[1].Should().Be(3);
         }
     }
 }

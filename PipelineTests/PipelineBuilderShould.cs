@@ -399,7 +399,7 @@
 
             //Assert
             pipeline.Should().NotBeNull();
-            pipeline.Should().BeAssignableTo<IDataflowPipeline<int, string>>();
+            pipeline.Should().BeAssignableTo<IDataflowPipeline<int>>();
         }
 
         [Fact]

@@ -13,13 +13,13 @@
 
     public class PipelineActionShould
     {
-        private readonly IDataflowPipeline<int, string> pipeline;
+        private readonly IDataflowPipeline<int> pipeline;
         private readonly IIoCAbstractFactory factory;
 
         public PipelineActionShould()
         {
             factory = Substitute.For<IIoCAbstractFactory>();
-            pipeline = Substitute.For<IDataflowPipeline<int, string>>();
+            pipeline = Substitute.For<IDataflowPipeline<int>>();
             pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
         }
 

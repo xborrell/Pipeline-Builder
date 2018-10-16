@@ -156,7 +156,7 @@
             AddBlock(pipeline, joinBlock);
         }
 
-        private void BuildJoinBlock3<TPipelineIn, TPipelineOut, TIn1, TIn2, TIn3>(IDataflowPipeline<TPipelineIn, TPipelineOut> pipeline)
+        private void BuildJoinBlock3<TIn1, TIn2, TIn3>(IDataflowPipeline pipeline)
         {
             var joinBlock = new JoinBlock<TIn1, TIn2, TIn3>();
             sources = new List<IDataflowBlock>

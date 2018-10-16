@@ -33,7 +33,7 @@
             await pipeline.Completion;
         }
 
-        private IDataflowPipeline<ICompilerOptions, IScriptRoot> BuildPipeline()
+        private IDataflowPipeline<ICompilerOptions> BuildPipeline()
         {
             var builder = PipelineBuilder<ICompilerOptions, IScriptRoot>.Create(factory)
                 .AddTransformation<IValidationStep>("parametersSource")

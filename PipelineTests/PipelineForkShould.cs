@@ -14,12 +14,12 @@
     public class PipelineForkShould
     {
         private readonly IIoCAbstractFactory factory;
-        private readonly IDataflowPipeline<int, string> pipeline;
+        private readonly IDataflowPipeline<int> pipeline;
 
         public PipelineForkShould()
         {
             factory = Substitute.For<IIoCAbstractFactory>();
-            pipeline = Substitute.For<IDataflowPipeline<int, string>>();
+            pipeline = Substitute.For<IDataflowPipeline<int>>();
             pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
         }
 
