@@ -2,7 +2,6 @@
 {
     using System;
     using System.Reflection;
-    using System.Threading.Tasks.Dataflow;
 
     public class PipelineLink : IPipelineLink
     {
@@ -62,7 +61,7 @@
             }
         }
 
-        public void Connect<T>(IDataflowPipeline<T> pipeline)
+        public void Connect<TPipelineIn, TPipelineOut>(IDataflowPipeline<TPipelineIn, TPipelineOut> pipeline)
         {
             var method = GetType().GetMethod("ConnectBlocks", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -71,12 +70,12 @@
                 throw new Exception("Could not found method 'ConnectBlocks'");
             }
 
-            var methodGeneric = method.MakeGenericMethod(Type, typeof(T));
+            var methodGeneric = method.MakeGenericMethod(Type, typeof(TPipelineIn), typeof(TPipelineOut));
 
             methodGeneric.Invoke(this, new object[]{pipeline});
         }
 
-        private void ConnectBlocks<TLink, T>(IDataflowPipeline<T> pipeline)
+        private void ConnectBlocks<TLink, TPipelineIn, TPipelineOut>(IDataflowPipeline<TPipelineIn, TPipelineOut> pipeline)
         {
             var source = Source.GetAsSource<TLink>(this);
             var target = Target.GetAsTarget<TLink>(this);

@@ -10,7 +10,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public class PipelineBuilder<TInput> : IPipelineBuilder<TInput>
+    public class PipelineBuilder<TInput, TOutput> : IPipelineBuilder<TInput, TOutput>
     {
         private static readonly Type CompilerActionGenericType = typeof(ICompilerAction<>);
         private static readonly Type CompilerTransformationGenericType = typeof(ICompilerTransformation<,>);
@@ -21,9 +21,9 @@
 
         public IEnumerable<IPipelineItem> Items => pipelineItems;
 
-        public static PipelineBuilder<TInput> Create(IIoCAbstractFactory factory)
+        public static PipelineBuilder<TInput, TOutput> Create(IIoCAbstractFactory factory)
         {
-            return new PipelineBuilder<TInput>(factory);
+            return new PipelineBuilder<TInput, TOutput>(factory);
         }
 
         protected PipelineBuilder(IIoCAbstractFactory factory)
@@ -32,7 +32,7 @@
             this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public IPipelineBuilder<TInput> AddAction<TStep>() where TStep : ICompilerStep
+        public IPipelineBuilder<TInput, TOutput> AddAction<TStep>() where TStep : ICompilerStep
         {
             var stepType = typeof(TStep);
 
@@ -61,7 +61,7 @@
             return this;
         }
 
-        public IPipelineBuilder<TInput> AddTransformation<TStep>(string name = "") where TStep : ICompilerStep
+        public IPipelineBuilder<TInput, TOutput> AddTransformation<TStep>(string name = "") where TStep : ICompilerStep
         {
             var stepType = typeof(TStep);
 
@@ -133,7 +133,7 @@
             }
         }
 
-        public IPipelineBuilder<TInput> LinkTo(string name)
+        public IPipelineBuilder<TInput, TOutput> LinkTo(string name)
         {
             name = name.ToLower();
 
@@ -144,13 +144,22 @@
             return this;
         }
 
-        public IDataflowPipeline<TInput> Build()
+        public IPipelineBuilder<TInput, TOutput> OutputTo(Action<TOutput> holder)
+        {
+            var action = new PipelineOutput<TOutput>();
+            action.SetOutput(holder);
+
+            AddTarget(action);
+            return this;
+        }
+
+        public IDataflowPipeline<TInput, TOutput> Build()
         {
             ResolveForks();
             ResolveJoins();
             CheckTypes();
 
-            var pipeline = new DataflowPipeline<TInput>();
+            var pipeline = new DataflowPipeline<TInput, TOutput>();
 
             BuildBlocks(pipeline);
             BuildConnections(pipeline);
@@ -212,7 +221,7 @@
             }
         }
 
-        private void BuildBlocks(IDataflowPipeline<TInput> pipeline)
+        private void BuildBlocks(IDataflowPipeline<TInput, TOutput> pipeline)
         {
             foreach (var pipelineItem in Items)
             {
@@ -220,7 +229,7 @@
             }
         }
 
-        private void BuildConnections(IDataflowPipeline<TInput> pipeline)
+        private void BuildConnections(IDataflowPipeline<TInput, TOutput> pipeline)
         {
             var links = Items.OfType<IPipelineSource>().SelectMany(source => source.OutputLinks)
                 .Union(

@@ -28,8 +28,8 @@
                 tracer.Debug("Command line Parsed.");
 
                 var options = optionsFactory();
-                options.InputFile = @"C:\Fonts\Newpol\Pipeline\Pipeline\Samples\Sample.txt";
-                options.OutputFolder = @"C:\Fonts\Newpol\Pipeline\Pipeline\Samples";
+                options.InputFile = @"C:\Fonts\xborrell\Pipeline-Builder\PipelineMain\Samples\Sample.txt";
+                options.OutputFolder = @"C:\Fonts\xborrell\Pipeline-Builder\PipelineMain\Samples";
                 options.ShowAbstractTree = true;
                 options.ShowConcreteTree = true;
 

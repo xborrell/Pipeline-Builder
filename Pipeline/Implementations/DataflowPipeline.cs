@@ -1,5 +1,6 @@
 ﻿namespace Pipeline
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -7,15 +8,16 @@
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
 
-    public class DataflowPipeline<T> : IDataflowPipeline<T>
+    public class DataflowPipeline<TIn, TOut> : IDataflowPipeline<TIn, TOut>
     {
-        private ITargetBlock<T> firstStep;
+        private ITargetBlock<TIn> firstStep;
         private readonly List<IDataflowBlock> steps;
         private readonly List<IDataflowBlock> lastSteps;
 
         public ExecutionDataflowBlockOptions BlockOptions { get; }
         public DataflowLinkOptions LinkOptions { get; private set; }
         public IEnumerable<IDataflowBlock> Blocks => steps;
+        public IEnumerable<IDataflowBlock> EndSteps => lastSteps;
 
         public DataflowPipeline()
         {
@@ -39,7 +41,7 @@
         {
             if (steps.Count == 0)
             {
-                firstStep = (ITargetBlock<T>)block;
+                firstStep = (ITargetBlock<TIn>)block;
             }
 
             steps.Add(block);
@@ -50,7 +52,7 @@
             lastSteps.Add(block);
         }
 
-        public void Post(T input)
+        public void Post(TIn input)
         {
             firstStep.Post(input);
         }
@@ -58,6 +60,17 @@
         public void Complete()
         {
             firstStep.Complete();
+        }
+
+        public void SetOutput(Action<TOut> outputHolder)
+        {
+            var lastBlock = (ISourceBlock<TOut>)steps.Last();
+
+            var block = new ActionBlock<TOut>(outputHolder, BlockOptions);
+            AddBlock(block);
+            AddEndStep(block);
+
+            lastBlock.LinkTo(block, LinkOptions);
         }
 
         public Task Completion => Task.WhenAll(lastSteps.Select(x => x.Completion));

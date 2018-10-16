@@ -6,8 +6,9 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public class PipelineAction<TStep, TInput> : PipelineItem, IPipelineAction<TStep, TInput> where TStep : ICompilerAction<TInput>
+    public class PipelineOutput<TInput> : PipelineItem, IPipelineOutput<TInput>
     {
+        private Action<TInput> holderAction;
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
 
         public IEnumerable<IPipelineLink> InputLinks => inputLinks;
@@ -42,7 +43,7 @@
 
         public override string ToString()
         {
-            return $"Action<{typeof(TStep).Name}>";
+            return "Output";
         }
 
         public override void ResolveLinkTypes(bool firstItem, Type firstType)
@@ -51,12 +52,12 @@
             {
                 if (inputLinks.Count > 0)
                 {
-                    throw new PipelineBuilderException($"The first action cannot be connected to any other block.");
+                    throw new PipelineBuilderException($"The first output cannot be connected to any other block.");
                 }
 
                 if (firstType != typeof(TInput))
                 {
-                    throw new PipelineBuilderException($"The type of first action must match the pipeline type.");
+                    throw new PipelineBuilderException($"The type of first output must match the pipeline type.");
                 }
             }
             else
@@ -65,25 +66,29 @@
                 {
                     if (inputLinks.Count == 0)
                     {
-                        throw new PipelineBuilderException($"Action without input link.");
+                        throw new PipelineBuilderException($"Output without input link.");
                     }
 
-                    throw new PipelineBuilderException($"Action with many input links.");
+                    throw new PipelineBuilderException($"Output with many input links.");
                 }
 
                 inputLinks[0].SetType(typeof(TInput));
             }
         }
 
+        public void SetOutput(Action<TInput> holder)
+        {
+            this.holderAction = holder;
+        }
+
         public override void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory)
         {
-            var step = factory.Resolve<TStep>();
-            var block = new ActionBlock<TInput>(input => step.Execute(input), pipeline.BlockOptions);
+            var block = new ActionBlock<TInput>(input => holderAction(input), pipeline.BlockOptions);
 
             AddBlock(pipeline, block);
             pipeline.AddEndStep(block);
         }
- 
+
         public ITargetBlock<TIn> GetAsTarget<TIn>(IPipelineLink link)
         {
             return (ITargetBlock<TIn>)blocks[0];

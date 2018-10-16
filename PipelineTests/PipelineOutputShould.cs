@@ -11,15 +11,15 @@
     using TASuite.Commons.Crosscutting;
     using Xunit;
 
-    public class PipelineActionShould
+    public class PipelineOutputShould
     {
-        private readonly IDataflowPipeline<int, string> pipeline;
+        private readonly IDataflowPipeline<int, int> pipeline;
         private readonly IIoCAbstractFactory factory;
 
-        public PipelineActionShould()
+        public PipelineOutputShould()
         {
             factory = Substitute.For<IIoCAbstractFactory>();
-            pipeline = Substitute.For<IDataflowPipeline<int, string>>();
+            pipeline = Substitute.For<IDataflowPipeline<int, int>>();
             pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
         }
 
@@ -27,7 +27,7 @@
         public void StoreDefaultLink()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(true);
 
@@ -43,7 +43,7 @@
         public void StoreNormalLink()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
             var link = Substitute.For<IPipelineLink>();
             link.IsDefault.Returns(false);
 
@@ -59,7 +59,7 @@
         public void ReplaceDefaultLink()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
             var defaultLink = Substitute.For<IPipelineLink>();
             defaultLink.IsDefault.Returns(true);
             item.AddInputLink(defaultLink);
@@ -81,7 +81,7 @@
         public void AcceptsTwoInputLinks()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
             var normalLink1 = Substitute.For<IPipelineLink>();
             normalLink1.IsDefault.Returns(false);
             item.AddInputLink(normalLink1);
@@ -99,23 +99,10 @@
         }
 
         [Fact]
-        public void CallTheFactoryWhenBuildsBlock()
-        {
-            // arrange
-            var item = new PipelineAction<IIntAction, int>();
-
-            //action
-            item.BuildBlock(pipeline, factory);
-
-            //assert
-            factory.Received(1).Resolve<IIntAction>();
-        }
-
-        [Fact]
         public void BuildsBlock()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
 
             //action
             item.BuildBlock(pipeline, factory);
@@ -131,7 +118,7 @@
         public void AddsTheBlockAsEndStep()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
 
             //action
             item.BuildBlock(pipeline, factory);
@@ -146,7 +133,7 @@
         public void GetsTheBlockAsTarget()
         {
             // arrange
-            var item = new PipelineAction<IIntAction, int>();
+            var item = new PipelineOutput<int>();
             item.BuildBlock(pipeline, factory);
             var normalLink = Substitute.For<IPipelineLink>();
             normalLink.IsDefault.Returns(false);

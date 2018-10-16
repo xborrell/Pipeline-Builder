@@ -100,7 +100,7 @@
         }
 
 
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
+        public override void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory)
         {
             var types = from link in InputLinks select link.Type;
             var typesList = types.ToList();
@@ -126,7 +126,6 @@
                 throw new Exception($"Could not found method '{methodName}'");
             }
 
-            typesList.Insert(0, typeof(TPipelineType));
             var methodGeneric = method.MakeGenericMethod(typesList.ToArray());
 
             methodGeneric.Invoke(this, new[] { pipeline });
@@ -144,7 +143,7 @@
             return (ITargetBlock<TIn>)sources[pos];
         }
 
-        private void BuildJoinBlock2<TPipelineType, TIn1, TIn2>(IDataflowPipeline<TPipelineType> pipeline)
+        private void BuildJoinBlock2<TIn1, TIn2>(IDataflowPipeline pipeline)
         {
             var joinBlock = new JoinBlock<TIn1, TIn2>();
 
@@ -157,7 +156,7 @@
             AddBlock(pipeline, joinBlock);
         }
 
-        private void BuildJoinBlock3<TPipelineType, TIn1, TIn2, TIn3>(IDataflowPipeline<TPipelineType> pipeline)
+        private void BuildJoinBlock3<TPipelineIn, TPipelineOut, TIn1, TIn2, TIn3>(IDataflowPipeline<TPipelineIn, TPipelineOut> pipeline)
         {
             var joinBlock = new JoinBlock<TIn1, TIn2, TIn3>();
             sources = new List<IDataflowBlock>

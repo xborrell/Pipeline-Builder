@@ -132,7 +132,7 @@
     public class PipelineTransformation<TStep, TInput, TOutput> : PipelineTransformationBase<TStep, TInput, TOutput>
         where TStep : class, ICompilerTransformation<TInput, TOutput>
     {
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
+        public override void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory)
         {
             var step = factory.Resolve<TStep>();
             AddBlock(pipeline, new TransformBlock<TInput, TOutput>(input => step.Execute(input), pipeline.BlockOptions));
@@ -152,7 +152,7 @@
     public class PipelineTransformation<TStep, TInput> : PipelineTransformationBase<TStep, TInput, TInput>
         where TStep : class, ICompilerTransformation<TInput, TInput>
     {
-        public override void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory)
+        public override void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory)
         {
             var steps = factory.ResolveAll<TStep>();
 

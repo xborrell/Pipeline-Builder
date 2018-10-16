@@ -15,7 +15,7 @@
             builder.RegisterType<Process>().AsSelf();
             builder.RegisterType<CompilerOptions>().As<ICompilerOptions>();
             builder.RegisterType<Compiler>().As<ICompiler>();
-            builder.RegisterType<PipelineBuilder<ICompilerOptions>>().As<IPipelineBuilder<ICompilerOptions>>();
+            builder.RegisterType<PipelineBuilder<ICompilerOptions, IScriptRoot>>().As<IPipelineBuilder<ICompilerOptions, IScriptRoot>>();
             builder.RegisterType<IoCAbstractFactory>().As<IIoCAbstractFactory>();
 
             RegisterSteps(builder);
@@ -45,6 +45,7 @@
             builder.RegisterType<AddExternalVariablesStep>().As<IAddExternalVariablesStep>();
             builder.RegisterType<AbstractTreeDisplayStep>().As<IAbstractTreeDisplayStep>();
             builder.RegisterType<AbstractTreeBuildStep>().As<IAbstractTreeBuildStep>();
+            builder.RegisterType<MacTreeHolderStep>().As<IMacTreeHolderStep>();
         }
     }
 

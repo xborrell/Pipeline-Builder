@@ -10,6 +10,6 @@
         IEnumerable<IDataflowBlock> Blocks { get; }
 
         void ResolveLinkTypes(bool firstItem, Type firstType);
-        void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory);
+        void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory);
     }
 }

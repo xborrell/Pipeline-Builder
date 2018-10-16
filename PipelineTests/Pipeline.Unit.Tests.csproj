@@ -60,6 +60,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DataflowPipelineShould.cs" />
+    <Compile Include="PipelineOutputShould.cs" />
     <Compile Include="PipelineLinkShould.cs" />
     <Compile Include="PipelineForkShould.cs" />
     <Compile Include="PipelineJoinShould.cs" />

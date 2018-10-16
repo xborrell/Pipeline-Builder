@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Commons\IIoCAbstractFactory.cs" />
     <Compile Include="Implementations\DataflowPipeline.cs" />
+    <Compile Include="Implementations\PipelineOutput.cs" />
     <Compile Include="Implementations\PipelineItem.cs" />
     <Compile Include="Implementations\PipelineAction.cs" />
     <Compile Include="Implementations\PipelineBuilder.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Implementations\PipelineBuilderException.cs" />
     <Compile Include="Interfaces\ICompilerTransformation.cs" />
     <Compile Include="Interfaces\IDataflowPipeline.cs" />
+    <Compile Include="Interfaces\IPipelineOutput.cs" />
     <Compile Include="Interfaces\IPipelineBuilder.cs" />
     <Compile Include="Interfaces\IPipelineNamedSource.cs" />
     <Compile Include="Interfaces\IPipelineStep.cs" />

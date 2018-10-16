@@ -28,7 +28,7 @@
         [Fact]
         public void CreateWithDependencies()
         {
-            var builder = PipelineBuilder<int>.Create(factory);
+            var builder = PipelineBuilder<int, string>.Create(factory);
 
             builder.Should().NotBeNull();
         }
@@ -36,7 +36,7 @@
         [Fact]
         public void AcceptStepAsActionWhenImplementsICompilerAction()
         {
-            var builder = PipelineBuilder<int>.Create(factory);
+            var builder = PipelineBuilder<int, string>.Create(factory);
 
             //Action
             Action acc = () => builder.AddAction<IIntAction>();
@@ -48,7 +48,7 @@
         [Fact]
         public void RejectStepAsActionWhenNotImplementsICompilerAction()
         {
-            var builder = PipelineBuilder<int>.Create(factory);
+            var builder = PipelineBuilder<int, string>.Create(factory);
 
             //Action
             Action acc = () => builder.AddAction<IRejectableTransformation>();
@@ -60,7 +60,7 @@
         [Fact]
         public void AcceptStepAsTransformationWhenImplementsICompilerTransformation()
         {
-            var builder = PipelineBuilder<int>.Create(factory);
+            var builder = PipelineBuilder<int, string>.Create(factory);
 
             //Action
             Action acc = () => builder.AddTransformation<IIntTransformation>();
@@ -72,7 +72,7 @@
         [Fact]
         public void RejectStepAsTransformationWhenNotImplementsICompilerTransformation()
         {
-            var builder = PipelineBuilder<int>.Create(factory);
+            var builder = PipelineBuilder<int, string>.Create(factory);
 
             //Action
             Action acc = () => builder.AddTransformation<IRejectableTransformation>();
@@ -84,7 +84,7 @@
         [Fact]
         public void AcceptsStepWhenBuildAndTheTypeMatchThePipelineAndIsTheFirstStep()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                 .AddAction<IIntAction>()
                 ;
 
@@ -98,7 +98,7 @@
         [Fact]
         public void RejectStepWhenBuildAndTheTypeNotMatchThePipelineAndIsTheFirstStep()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                 .AddAction<IStringAction>()
                 ;
 
@@ -112,7 +112,7 @@
         [Fact]
         public void AcceptsStepWhenBuildAndTheTypeMatchTheDefaultLinkedTransformation()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                 .AddTransformation<IIntTransformation>()
                 .AddAction<IIntAction>()
                 ;
@@ -127,7 +127,7 @@
         [Fact]
         public void RejectStepWhenBuildAndTheTypeNotMatchTheDefaultLinkedTransformation()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                 .AddTransformation<IIntToStringTransformation>()
                 .AddAction<IIntAction>()
                 ;
@@ -142,7 +142,7 @@
         [Fact]
         public void AddTransformationWithName()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntToStringTransformation>("name")
                     .AddAction<IStringAction>()
                 ;
@@ -157,7 +157,7 @@
         [Fact]
         public void AcceptsStepWhenBuildAndTheTypeMatchTheLastTransformation()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
                     .AddAction<IStringAction>()
@@ -173,7 +173,7 @@
         [Fact]
         public void CreateDefaultLink()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>()
                     .AddAction<IIntAction>()
                 ;
@@ -190,7 +190,7 @@
         [Fact]
         public void CountTheLinksBeforeBuild()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>("name")
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
@@ -216,7 +216,7 @@
         [Fact]
         public void ExplicitLinkSteps()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                 .AddTransformation<IIntTransformation>("name")
                 .AddTransformation<IIntToStringTransformation>()
                 .AddAction<IStringAction>()
@@ -238,7 +238,7 @@
         [Fact]
         public void InsertJoinWhenTwoInputLinksExists()
         {
-            var pipeline = PipelineBuilder<int>.Create(factory)
+            var pipeline = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>("name1")
                     .AddTransformation<IIntToStringTransformation>()
                     .AddTransformation<IStringTransformation>("name2")
@@ -256,7 +256,7 @@
         [Fact]
         public void InsertForkWhenTwoOutputLinksExists()
         {
-            var pipeline = PipelineBuilder<int>.Create(factory)
+            var pipeline = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
                     .AddAction<IStringAction>()
@@ -271,7 +271,7 @@
         [Fact]
         public void RejectStepWhenBuildAndTheTypeNotMatchTheJoinedTypes()
         {
-            var pipeline = PipelineBuilder<int>.Create(factory)
+            var pipeline = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>("name1")
                     .AddTransformation<IStringTransformation>("name2")
                     .AddAction<IIntAction>()
@@ -289,7 +289,7 @@
         [Fact]
         public void ResolveSimpleLink()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>()
                     .AddAction<IIntAction>()
                 ;
@@ -310,7 +310,7 @@
         [Fact]
         public void ResolveSimpleChain()
         {
-            var pipeline = PipelineBuilder<int>.Create(factory)
+            var pipeline = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>()
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
@@ -334,7 +334,7 @@
         [Fact]
         public void ResolveSimpleFork()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
                     .AddAction<IStringAction>()
@@ -360,7 +360,7 @@
         [Fact]
         public void ResolveSimpleJoin()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>("name1")
                     .AddTransformation<IIntToStringTransformation>("name2")
                     .AddAction<ITupla2Action>()
@@ -390,7 +390,7 @@
         [Fact]
         public void BuildPipeline()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddAction<IIntAction>()
                 ;
 
@@ -399,13 +399,13 @@
 
             //Assert
             pipeline.Should().NotBeNull();
-            pipeline.Should().BeAssignableTo<IDataflowPipeline<int>>();
+            pipeline.Should().BeAssignableTo<IDataflowPipeline<int, string>>();
         }
 
         [Fact]
         public void BuildActionBlock()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddAction<IIntAction>()
                 ;
             var pipeline = builder.Build();
@@ -422,7 +422,7 @@
         [Fact]
         public void BuildTransformationBlock()
         {
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>()
                     .AddAction<IIntAction>()
                 ;
@@ -442,7 +442,7 @@
         [Fact]
         public void BuildForkBlock()
         {
-            var pipeline = PipelineBuilder<int>.Create(factory)
+            var pipeline = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntToStringTransformation>()
                     .AddAction<IStringAction>()
                     .AddAction<IStringAction>()
@@ -457,7 +457,7 @@
         [Fact]
         public void BuildJoinBlock()
         {
-            var pipeline = PipelineBuilder<int>.Create(factory)
+            var pipeline = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>("name1")
                     .AddTransformation<IIntToStringTransformation>("name2")
                     .AddAction<ITupla2Action>()
@@ -476,7 +476,7 @@
         {
             factory.ResolveAll<IIntTransformation>().Returns(new List<IIntTransformation>{Substitute.For<IIntTransformation>(), Substitute.For<IIntTransformation>()});
 
-            var builder = PipelineBuilder<int>.Create(factory)
+            var builder = PipelineBuilder<int, string>.Create(factory)
                     .AddTransformation<IIntTransformation>()
                     .AddAction<IIntAction>()
                 ;

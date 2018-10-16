@@ -11,9 +11,9 @@
         protected List<IDataflowBlock> blocks = new List<IDataflowBlock>();
 
         public abstract void ResolveLinkTypes(bool firstItem, Type firstType);
-        public abstract void BuildBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IIoCAbstractFactory factory);
+        public abstract void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory);
 
-        protected void AddBlock<TPipelineType>(IDataflowPipeline<TPipelineType> pipeline, IDataflowBlock block)
+        protected void AddBlock(IDataflowPipeline pipeline, IDataflowBlock block)
         {
             pipeline.AddBlock(block);
             blocks.Add(block);

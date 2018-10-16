@@ -14,12 +14,12 @@
     public class PipelineJoinShould
     {
         private readonly IIoCAbstractFactory factory;
-        private readonly IDataflowPipeline<int> pipeline;
+        private readonly IDataflowPipeline<int, string> pipeline;
 
         public PipelineJoinShould()
         {
             factory = Substitute.For<IIoCAbstractFactory>();
-            pipeline = Substitute.For<IDataflowPipeline<int>>();
+            pipeline = Substitute.For<IDataflowPipeline<int, string>>();
             pipeline.BlockOptions.Returns(new ExecutionDataflowBlockOptions());
         }
         [Fact]
