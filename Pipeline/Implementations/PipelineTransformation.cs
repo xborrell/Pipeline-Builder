@@ -6,7 +6,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public abstract class PipelineTransformationBase<TStep, TInput, TOutput> : PipelineItem, IPipelineTransformation<TStep, TInput, TOutput>
+    internal abstract class PipelineTransformationBase<TStep, TInput, TOutput> : PipelineItem, IPipelineTransformation<TStep, TInput, TOutput>
         where TStep : class, ICompilerTransformation<TInput, TOutput>
     {
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
@@ -129,7 +129,7 @@
         }
     }
 
-    public class PipelineTransformation<TStep, TInput, TOutput> : PipelineTransformationBase<TStep, TInput, TOutput>
+    internal class PipelineTransformation<TStep, TInput, TOutput> : PipelineTransformationBase<TStep, TInput, TOutput>
         where TStep : class, ICompilerTransformation<TInput, TOutput>
     {
         public override void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory)
@@ -149,7 +149,7 @@
         }
     }
 
-    public class PipelineTransformation<TStep, TInput> : PipelineTransformationBase<TStep, TInput, TInput>
+    internal class PipelineTransformation<TStep, TInput> : PipelineTransformationBase<TStep, TInput, TInput>
         where TStep : class, ICompilerTransformation<TInput, TInput>
     {
         public override void BuildBlock(IDataflowPipeline pipeline, IIoCAbstractFactory factory)

@@ -1,6 +1,6 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineNamedSource : IPipelineSource
+    internal interface IPipelineNamedSource : IPipelineSource
     {
         string Name { get; }
         void SetName(string name);

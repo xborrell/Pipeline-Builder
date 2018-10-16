@@ -7,7 +7,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public class PipelineJoin : PipelineItem, IPipelineJoin
+    internal class PipelineJoin : PipelineItem, IPipelineJoin
     {
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
         private IPipelineLink outputLink;

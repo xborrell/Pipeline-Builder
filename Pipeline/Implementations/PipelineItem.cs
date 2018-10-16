@@ -5,7 +5,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public abstract class PipelineItem : IPipelineItem
+    internal abstract class PipelineItem : IPipelineItem
     {
         public IEnumerable<IDataflowBlock> Blocks => blocks;
         protected List<IDataflowBlock> blocks = new List<IDataflowBlock>();

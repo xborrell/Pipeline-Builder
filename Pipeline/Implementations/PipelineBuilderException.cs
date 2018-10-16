@@ -3,7 +3,7 @@
     using System;
     using System.Runtime.Serialization;
 
-    public class PipelineBuilderException : Exception
+    internal class PipelineBuilderException : Exception
     {
         public PipelineBuilderException()
         {

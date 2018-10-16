@@ -2,7 +2,7 @@
 {
     using System;
 
-    public interface IPipelineLink 
+    internal interface IPipelineLink 
     {
         bool IsDefault { get; }
         IPipelineSource Source { get; }

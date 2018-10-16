@@ -3,7 +3,7 @@
     using System;
     using System.Reflection;
 
-    public class PipelineLink : IPipelineLink
+    internal class PipelineLink : IPipelineLink
     {
         public bool IsDefault { get; }
         public IPipelineSource Source { get; private set; }

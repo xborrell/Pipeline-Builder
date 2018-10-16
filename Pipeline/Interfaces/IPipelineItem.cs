@@ -5,7 +5,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public interface IPipelineItem
+    internal interface IPipelineItem
     {
         IEnumerable<IDataflowBlock> Blocks { get; }
 

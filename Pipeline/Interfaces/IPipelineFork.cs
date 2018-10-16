@@ -1,6 +1,6 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineFork : IPipelineSource, IPipelineTarget
+    internal interface IPipelineFork : IPipelineSource, IPipelineTarget
     {
     }
 }

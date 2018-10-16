@@ -1,6 +1,6 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineJoin : IPipelineSource, IPipelineTarget
+    internal interface IPipelineJoin : IPipelineSource, IPipelineTarget
     {
     }
 }

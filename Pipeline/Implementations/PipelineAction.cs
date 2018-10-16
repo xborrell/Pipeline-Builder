@@ -6,7 +6,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public class PipelineAction<TStep, TInput> : PipelineItem, IPipelineAction<TStep, TInput> where TStep : ICompilerAction<TInput>
+    internal class PipelineAction<TStep, TInput> : PipelineItem, IPipelineAction<TStep, TInput> where TStep : ICompilerAction<TInput>
     {
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();
 

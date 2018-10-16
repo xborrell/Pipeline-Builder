@@ -19,7 +19,7 @@
         private readonly List<IPipelineItem> pipelineItems;
         private IPipelineTarget lastItem;
 
-        public IEnumerable<IPipelineItem> Items => pipelineItems;
+        internal IEnumerable<IPipelineItem> Items => pipelineItems;
 
         public static PipelineBuilder<TInput, TOutput> Create(IIoCAbstractFactory factory)
         {

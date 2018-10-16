@@ -6,7 +6,7 @@
     using System.Threading.Tasks.Dataflow;
     using TASuite.Commons.Crosscutting;
 
-    public class PipelineOutput<TInput> : PipelineItem, IPipelineOutput<TInput>
+    internal class PipelineOutput<TInput> : PipelineItem, IPipelineOutput<TInput>
     {
         private Action<TInput> holderAction;
         private readonly List<IPipelineLink> inputLinks = new List<IPipelineLink>();

@@ -180,7 +180,8 @@
 
             builder.Build();
 
-            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
+            var builderForTest = (PipelineBuilder<int, string>)builder;
+            var intAction = builderForTest.Items.OfType<IPipelineAction<IIntAction, int>>().First();
 
             intAction.InputLinks.Count().Should().Be(1);
             var link = intAction.InputLinks.First();
@@ -198,18 +199,20 @@
                     .LinkTo("name")
                 ;
 
-            var intTransformation = builder.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
+            var builderForTest = (PipelineBuilder<int, string>)builder;
+            
+            var intTransformation = builderForTest.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
             intTransformation.InputLinks.Count().Should().Be(0);
             intTransformation.OutputLinks.Count().Should().Be(2);
 
-            var intToStringTransformation = builder.Items.OfType<IPipelineTransformation<IIntToStringTransformation, int, string>>().First();
+            var intToStringTransformation = builderForTest.Items.OfType<IPipelineTransformation<IIntToStringTransformation, int, string>>().First();
             intToStringTransformation.InputLinks.Count().Should().Be(1);
             intToStringTransformation.OutputLinks.Count().Should().Be(1);
 
-            var stringAction = builder.Items.OfType<IPipelineAction<IStringAction, string>>().First();
+            var stringAction = builderForTest.Items.OfType<IPipelineAction<IStringAction, string>>().First();
             stringAction.InputLinks.Count().Should().Be(1);
 
-            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
+            var intAction = builderForTest.Items.OfType<IPipelineAction<IIntAction, int>>().First();
             intAction.InputLinks.Count().Should().Be(1);
         }
 
@@ -225,13 +228,15 @@
                 ;
 
             //Assert
-            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
+            var builderForTest = (PipelineBuilder<int, string>)builder;
+
+            var intAction = builderForTest.Items.OfType<IPipelineAction<IIntAction, int>>().First();
 
             intAction.InputLinks.Count().Should().Be(1);
             var link = intAction.InputLinks.First();
             link.IsDefault.Should().BeFalse();
 
-            var intTransformation = builder.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
+            var intTransformation = builderForTest.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
             link.Source.Should().Be(intTransformation);
         }
 
@@ -410,7 +415,9 @@
                 ;
             var pipeline = builder.Build();
 
-            var intAction = builder.Items.OfType<IPipelineAction<IIntAction, int>>().First();
+            var builderForTest = (PipelineBuilder<int, string>)builder;
+
+            var intAction = builderForTest.Items.OfType<IPipelineAction<IIntAction, int>>().First();
             intAction.Should().NotBeNull();
 
             var intBlock = pipeline.Blocks.OfType<ActionBlock<int>>().First();
@@ -429,7 +436,9 @@
 
             var pipeline = builder.Build();
 
-            var intTransformation = builder.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
+            var builderForTest = (PipelineBuilder<int, string>)builder;
+
+            var intTransformation = builderForTest.Items.OfType<IPipelineTransformation<IIntTransformation, int, int>>().First();
             intTransformation.Should().NotBeNull();
 
             var intBlock = pipeline.Blocks.OfType<TransformBlock<int, int>>().First();

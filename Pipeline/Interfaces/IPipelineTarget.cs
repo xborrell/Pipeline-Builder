@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks.Dataflow;
 
-    public interface IPipelineTarget : IPipelineItem
+    internal interface IPipelineTarget : IPipelineItem
     {
         IEnumerable<IPipelineLink> InputLinks { get; }
         void AddInputLink(IPipelineLink pipelineLink);

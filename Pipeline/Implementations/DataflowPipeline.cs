@@ -8,7 +8,7 @@
     using System.Threading.Tasks;
     using System.Threading.Tasks.Dataflow;
 
-    public class DataflowPipeline<TIn> : IDataflowPipeline<TIn>
+    internal class DataflowPipeline<TIn> : IDataflowPipeline<TIn>
     {
         private ITargetBlock<TIn> firstStep;
         private readonly List<IDataflowBlock> steps;

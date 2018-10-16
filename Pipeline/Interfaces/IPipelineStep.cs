@@ -1,6 +1,6 @@
 ﻿namespace Pipeline
 {
-    public interface IPipelineStep<TStep> : IPipelineItem
+    internal interface IPipelineStep<TStep> : IPipelineItem
     {
     }
 }
